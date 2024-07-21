@@ -5,6 +5,7 @@ using System.Windows.Markup;
 using System.Xml;
 using MarkdownDeep;
 using org.SpocWeb.root.Data.xmls.htmls.xamls;
+using org.SpocWeb.root.Extensions;
 
 namespace MarkDownWpfGui;
 
@@ -19,7 +20,8 @@ public partial class MainWindow {
 
 	public MainWindow() {
 		InitializeComponent();
-		_TxtMarkdown.Text = File.ReadAllText("MarkdownSyntax.md");
+		XXmlReader.XmlReaderSettings.DtdProcessing = DtdProcessing.Ignore;
+        _TxtMarkdown.Text = File.ReadAllText("MarkdownSyntax.md");
 		_TxtMarkdown.SelectionStart = _TxtMarkdown.Text.Length;
 	}
 
