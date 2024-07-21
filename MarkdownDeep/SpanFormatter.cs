@@ -14,7 +14,7 @@ namespace MarkdownDeep {
 		/// <summary> reference to the owning markdown object, in case we need to check for formatting options </summary>
 		readonly Markdown _Markdown;
 
-		readonly List<Token> _Tokens = new List<Token>();
+		readonly List<Token> _Tokens = new();
 
 		internal bool DisableLinks;
 
@@ -292,7 +292,7 @@ namespace MarkdownDeep {
 
 			List<Token> emphasisMarks = null;
 
-			List<Abbreviation> abbreviations = _Markdown.GetAbbreviations();
+			List<Abbreviation>? abbreviations = _Markdown.GetAbbreviations();
 			bool extraMode = _Markdown.IsExtraMode;
 
 			// Scan string
@@ -1024,7 +1024,7 @@ namespace MarkdownDeep {
 		#region Token Pooling
 
 		// CreateToken - create or re-use a token object
-		readonly Stack<Token> _SpareTokens = new Stack<Token>();
+		readonly Stack<Token> _SpareTokens = new();
 
 		internal Token CreateToken(TokenType type, int startOffset, int length) {
 			if (_SpareTokens.Count != 0) {

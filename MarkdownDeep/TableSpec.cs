@@ -13,11 +13,11 @@ namespace MarkdownDeep {
 	/// <summary> definition of a simple table, including column alignments, header text and row information. </summary>
 	internal class TableSpec {
 		public const string NbSp = "&#160;";
-		public List<ColumnAlignment> Columns = new List<ColumnAlignment>();
+		public List<ColumnAlignment> Columns = new();
 
 		public List<string> Headers;
 		public bool LeadingBar;
-		public List<List<string>> Rows = new List<List<string>>();
+		public List<List<string>> Rows = new();
 		public bool TrailingBar;
 
 		public List<string> ParseRow(StringScanner p) {

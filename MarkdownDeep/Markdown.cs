@@ -134,25 +134,25 @@ namespace MarkdownDeep {
 		#endregion RenderHtml
 
 		// Constructor
-		readonly Dictionary<string, Block> _Footnotes = new Dictionary<string, Block>();
-		readonly Dictionary<string, LinkDefinition> _LinkDefinitions = new Dictionary<string, LinkDefinition>(StringComparer.CurrentCultureIgnoreCase);
-		readonly StringBuilder _StringBuilder = new StringBuilder();
-		readonly StringBuilder _StringBuilderFinal = new StringBuilder();
-		internal readonly StringScanner _StringScanner = new StringScanner();
-		readonly List<Block> _UsedFootnotes = new List<Block>();
-		readonly Dictionary<string, bool> _UsedHeaderIDs = new Dictionary<string, bool>();
+		readonly Dictionary<string, Block> _Footnotes = new();
+		readonly Dictionary<string, LinkDefinition> _LinkDefinitions = new(StringComparer.CurrentCultureIgnoreCase);
+		readonly StringBuilder _StringBuilder = new();
+		readonly StringBuilder _StringBuilderFinal = new();
+		internal readonly StringScanner _StringScanner = new();
+		readonly List<Block> _UsedFootnotes = new();
+		readonly Dictionary<string, bool> _UsedHeaderIDs = new();
 
 		#region Providers 
 		public Func<Markdown, string, string> FormatCodeBlock;
 		internal Func<ImageInfo, bool> GetImageSize;
 		internal Func<HtmlTag, bool, bool> PrepareImage;
 		internal Func<HtmlTag, bool> PrepareLink;
-		internal Func<string, string> QualifyUrl;
+		internal Func<string, string>? QualifyUrl;
 		#endregion Providers
 
 		internal bool RenderingTitledImage = false;
-		List<Abbreviation> _AbbreviationList;
-		Dictionary<string, Abbreviation> _AbbreviationMap;
+		List<Abbreviation>? _AbbreviationList;
+		Dictionary<string, Abbreviation>? _AbbreviationMap;
 
 		public Markdown() {
 			HtmlClassFootnotes = "footnotes";
@@ -194,19 +194,18 @@ namespace MarkdownDeep {
 		/// <remarks>
 		/// Useful when rendering RSS feeds that require fully qualified urls.
 		/// </remarks>
-		public string UrlBaseLocation { get; set; }
+		public string? UrlBaseLocation { get; set; }
 
-		/*/ When set, all non-qualified urls (links and images) begining with a slash
+        /*/ When set, all non-qualified urls (links and images) begining with a slash
 		// will qualified by prefixing with this string.
 		// Useful when rendering RSS feeds that require fully qualified urls.
 		string UrlRootLocation { get; set; }
 		*/
-		/// <summary>
-		/// When true, all fully qualified urls will be give `target="_blank"' attribute
-		// causing them to appear in a separate browser window/tab
-		// ie: relative links open in same window, qualified links open externally
-		/// </summary>
-		public bool UseNewWindowForExternalLinks { get; set; }
+        /// <summary> When true, all fully qualified urls will be give `target="_blank"` attribute
+        /// causing them to appear in a separate browser window/tab
+        /// ie: relative links open in same window, qualified links open externally
+        /// </summary>
+        public bool UseNewWindowForExternalLinks { get; set; }
 
 		/// <summary> When true, all urls (qualified or not) will get target="_blank" attribute (useful for preview mode on posts) </summary>
 		public bool UseNewWindowForLocalLinks { get; set; }
@@ -214,7 +213,7 @@ namespace MarkdownDeep {
 		/// <summary> Local file system location of the Web root.  Used to locate image files that start with slash. </summary>
 		/// <remarks>
 		/// When set, will try to determine the width/height for local images by searching
-		// for an appropriately named file relative to the specified location
+		/// for an appropriately named file relative to the specified location
 		/// </remarks>
 		/// <example>c:\inetpub\www\wwwroot</example>
 		public string DocumentRoot { get; set; }
@@ -264,7 +263,7 @@ namespace MarkdownDeep {
 		///
 		/// Use CSS to style the figure and the caption
 		/// </remarks>
-		public string HtmlClassTitledImages { get; set; }
+		public string? HtmlClassTitledImages { get; set; }
 
 		/// <summary> Set a format string to be rendered before headings </summary>
 		/// <remarks>
@@ -272,16 +271,16 @@ namespace MarkdownDeep {
 		/// (useful for rendering links that can lead to a page that edits that section)
 		/// (eg: "<a href='/edit/page?section={0}' />"
 		/// </remarks>
-		public string SectionHeader { get; set; }
+		public string? SectionHeader { get; set; }
 
 		/// <summary> Set a format string to be rendered after each section heading </summary>
-		public string SectionHeadingSuffix { get; set; }
+		public string? SectionHeadingSuffix { get; set; }
 
 		/// <summary> Set a format string to be rendered after the section content  </summary>
 		/// <remarks>
 		/// (ie: before the next section heading, or at the end of the document).
 		/// </remarks>
-		public string SectionFooter { get; set; }
+		public string? SectionFooter { get; set; }
 
 		#endregion Public Settings
 
@@ -291,7 +290,7 @@ namespace MarkdownDeep {
 
 		// We cache and re-use blocks for Performance
 
-		readonly Stack<Block> _SpareBlocks = new Stack<Block>();
+		readonly Stack<Block> _SpareBlocks = new();
 		public bool IncludeMarkup;
 
 		internal Block CreateBlock() {
@@ -533,7 +532,7 @@ namespace MarkdownDeep {
 			_AbbreviationMap.Add(abbr, new Abbreviation(abbr, title));
 		}
 
-		internal List<Abbreviation> GetAbbreviations() => _AbbreviationList;
+		internal List<Abbreviation>? GetAbbreviations() => _AbbreviationList;
 
 		// HtmlEncode a range in a string to a specified string builder
 		internal void HtmlEncode(StringBuilder dest, string str, int start, int len) {

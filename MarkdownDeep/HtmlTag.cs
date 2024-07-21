@@ -23,8 +23,7 @@ namespace MarkdownDeep {
 		HtmlTagFlags _Flags = 0;
 
 		// Get a dictionary of attribute values (no decoding done)
-		public readonly Dictionary<string, string> Attributes  =
-			new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+		public readonly Dictionary<string, string> Attributes = new(StringComparer.CurrentCultureIgnoreCase);
 
 		public void AddAttribute(string key, string value) => Attributes.Add(key, value);
 
@@ -42,7 +41,7 @@ namespace MarkdownDeep {
 			}
 		}
 
-		static readonly Dictionary<string, HtmlTagFlags> _TAG_FLAGS = new Dictionary<string, HtmlTagFlags> {
+		static readonly Dictionary<string, HtmlTagFlags> _TAG_FLAGS = new() {
 			{"p", HtmlTagFlags.Block | HtmlTagFlags.ContentAsSpan},
 			{"div", HtmlTagFlags.Block},
 			{"h1", HtmlTagFlags.Block | HtmlTagFlags.ContentAsSpan},
@@ -90,7 +89,7 @@ namespace MarkdownDeep {
 		};
 
 		/// <summary> Safe Attributes by HTML Element </summary>
-		static readonly Dictionary<string, string[]> _ALLOWED_ATTRIBUTES = new Dictionary<string, string[]> {
+		static readonly Dictionary<string, string[]> _ALLOWED_ATTRIBUTES = new() {
 			{"a", new[] {"href", "title", "class"}},
 			{"img", new[] {"src", "width", "height", "alt", "title", "class"}},
 		};

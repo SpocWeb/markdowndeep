@@ -10,20 +10,20 @@ namespace MarkdownDeep {
 	/// </remarks>
 	public class LinkDefinition {
 
-		public LinkDefinition(string id, string? url = null, string? title = null) {
+		public LinkDefinition(string? id, string? url = null, string? title = null) {
 			Id = id;
 			Url = url;
 			Title = title;
 		}
 
-		public string Id { get; set; }
+		public string? Id { get; set; }
 
 		public string? Url { get; set; }
 
 		public string? Title { get; set; }
 
 		internal void RenderLink(Markdown m, StringBuilder b, string linkText) {
-			if (Url.StartsWith("mailto:")) {
+			if (Url?.StartsWith("mailto:") ?? false) {
 				b.Append("<a href=\"");
 				Utils.HtmlRandomize(b, Url);
 				b.Append('\"');
@@ -146,7 +146,7 @@ namespace MarkdownDeep {
 		// Parse just the link target
 		// For reference link definition, this is the bit after "[id]: thisbit"
 		// For inline link, this is the bit in the parens: [link text](thisbit)
-		internal static LinkDefinition ParseLinkTarget(StringScanner p, string id, bool extraMode) {
+		internal static LinkDefinition? ParseLinkTarget(StringScanner p, string id, bool extraMode) {
 			// Skip whitespace
 			p.SkipWhitespace();
 

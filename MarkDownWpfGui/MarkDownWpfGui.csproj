@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<TargetFrameworks>net48;net8.0</TargetFrameworks>
+		<TargetFrameworks>net48</TargetFrameworks>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\..\..\..\NET\org.SpocWeb.snk</AssemblyOriginatorKeyFile>
 		<RootNamespace>$(MSBuildProjectName)</RootNamespace>
@@ -32,7 +32,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<OutputType>Exe</OutputType>
-		<StartupObject>MarkdownDeepTests.Program</StartupObject>
+    <UseWPF>true</UseWPF>
+		<StartupObject></StartupObject>
 
 		<Description>Fundamental Interfaces, Delegates, Enums and Base Classes for any Domain</Description>
 		<PackageProjectUrl>http://Spoc-Web.com</PackageProjectUrl>
@@ -68,6 +69,7 @@
 		<Reference Include="System.Numerics.Vectors">
 			<HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\System.Numerics.Vectors.dll</HintPath>
 		</Reference>
+		<Reference Include="WindowsBase" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -97,7 +99,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\NET\_root\Data\xmls\htmls\xaml\Htmls.Xamls.csproj" />
 	  <ProjectReference Include="..\MarkdownDeep\MarkdownDeep.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="MarkdownSyntax.md">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>

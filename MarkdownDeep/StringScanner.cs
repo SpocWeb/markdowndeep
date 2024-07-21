@@ -343,13 +343,13 @@ namespace MarkdownDeep {
 		}
 
 		// Skip an identifier
-		public bool SkipIdentifier(ref string identifier) {
-			int savepos = Position;
+		public bool SkipIdentifier(ref string? identifier) {
+			int savePos = Position;
 			if (!Utils.ParseIdentifier(Input, ref _Pos, ref identifier)) {
 				return false;
 			}
 			if (_Pos >= _End) {
-				_Pos = savepos;
+				_Pos = savePos;
 				return false;
 			}
 			return true;
