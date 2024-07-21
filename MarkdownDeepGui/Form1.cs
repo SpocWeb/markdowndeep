@@ -1,49 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Windows.Forms;
+using MarkdownDeep;
 
-namespace MarkdownDeepGui
-{
-	public partial class Form1 : Form
-	{
-		public Form1()
-		{
+namespace MarkdownDeepGui {
+	public partial class Form1 : Form {
+		readonly Markdown _Markdown = new Markdown();
+
+		public Form1() {
 			InitializeComponent();
-			this.txtMarkdown.Text = "# Welcome to MarkdownDeep #\r\n\r\nType markdown text above, see formatted text below!";
-			this.txtMarkdown.SelectionStart = this.txtMarkdown.Text.Length;
-			m_Markdown.ExtraMode = true;
+			txtMarkdown.Text = File.ReadAllText("MarkdownSyntax.md");
+			//txtMarkdown.Text = @"# Welcome to Markdown #\r\n\r\nType markdown text above, see formatted text below!";
+			txtMarkdown.SelectionStart = txtMarkdown.Text.Length;
+			_Markdown.IsExtraMode = true;
 		}
 
-		private void doUpdate()
-		{
-			this.txtSource.Text = m_Markdown.Transform(txtMarkdown.Text).Replace("\n", "\r\n");
-			this.webPreview.DocumentText = this.txtSource.Text;
+		void DoUpdate() {
+			txtSource.Text = _Markdown.AsHtml(txtMarkdown.Text).Replace("\n", "\r\n");
+			webPreview.DocumentText = txtSource.Text;
 		}
 
-		private void txtMarkdown_TextChanged(object sender, EventArgs e)
-		{
-			doUpdate();
+		void txtMarkdown_TextChanged(object sender, EventArgs e) {
+			DoUpdate();
 		}
 
 
-
-		MarkdownDeep.Markdown m_Markdown = new MarkdownDeep.Markdown();
-
-		private void checkSafeMode_CheckedChanged(object sender, EventArgs e)
-		{
-			m_Markdown.SafeMode = this.checkSafeMode.Checked;
-			doUpdate();
+		void checkSafeMode_CheckedChanged(object sender, EventArgs e) {
+			_Markdown.IsSafeMode = checkSafeMode.Checked;
+			DoUpdate();
 		}
 
-		private void checkExtraMode_CheckedChanged(object sender, EventArgs e)
-		{
-			m_Markdown.ExtraMode = this.checkExtraMode.Checked;
-			doUpdate();
+		void checkExtraMode_CheckedChanged(object sender, EventArgs e) {
+			_Markdown.IsExtraMode = checkExtraMode.Checked;
+			DoUpdate();
 		}
 	}
 }

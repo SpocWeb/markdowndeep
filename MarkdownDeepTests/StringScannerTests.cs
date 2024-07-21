@@ -1,32 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using MarkdownDeep;
 using NUnit.Framework;
-using MarkdownDeep;
 
-namespace MarkdownDeepTests
-{
+namespace MarkdownDeepTests {
 	[TestFixture]
-	class StringScannerTests
-	{
+	internal class StringScannerTests {
 		[Test]
-		public void Tests()
-		{
+		public void Tests() {
 			var p = new StringScanner();
 
 			p.Reset("This is a string with something [bracketed]");
-			Assert.IsTrue(p.bof);
-			Assert.IsFalse(p.eof);
+			Assert.IsTrue(p.Bof);
+			Assert.IsFalse(p.Eof);
 			Assert.IsTrue(p.SkipString("This"));
-			Assert.IsFalse(p.bof);
-			Assert.IsFalse(p.eof);
+			Assert.IsFalse(p.Bof);
+			Assert.IsFalse(p.Eof);
 			Assert.IsFalse(p.SkipString("huh?"));
 			Assert.IsTrue(p.SkipLinespace());
 			Assert.IsTrue(p.SkipChar('i'));
 			Assert.IsTrue(p.SkipChar('s'));
 			Assert.IsTrue(p.SkipWhitespace());
-			Assert.IsTrue(p.DoesMatchAny(new char[] { 'r', 'a', 't'} ));
+			Assert.IsTrue(p.DoesMatchAny(new[] {'r', 'a', 't'}));
 			Assert.IsFalse(p.Find("Not here"));
 			Assert.IsFalse(p.Find("WITH"));
 			Assert.IsFalse(p.FindI("Not here"));
@@ -37,7 +30,7 @@ namespace MarkdownDeepTests
 			Assert.IsTrue(p.Find(']'));
 			Assert.AreEqual("bracketed", p.Extract());
 			Assert.IsTrue(p.SkipChar(']'));
-			Assert.IsTrue(p.eof);
+			Assert.IsTrue(p.Eof);
 		}
 	}
 }

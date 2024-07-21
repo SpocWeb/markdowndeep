@@ -1,0 +1,23 @@
+﻿<Window x:Class="MarkDownWpfGui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBox Name="_TxtMarkdown" Background="White" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True" TextChanged="TxtMarkdown_OnTextChanged"/>
+        <RichTextBox Grid.Row="0" Grid.Column="1" Background="Cyan" Name="_RichTextBox" AcceptsReturn="True" AcceptsTab="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+	    <TextBox Name="_TxtHtml" Grid.Row="1" Grid.Column="0" Background="Yellow" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True" TextChanged="_TxtHtml_OnTextChanged"/>
+        <TextBox Name="_TxtXaml" Grid.Row="1" Background="Magenta" Grid.Column="1" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True" TextChanged="_TxtXaml_OnTextChanged"/>
+        <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Background="Black" ShowsPreview="true" Width="5"/>
+        <GridSplitter Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Black" ShowsPreview="true" Height="5"/>
+        <!--<FlowDocumentScrollViewer DockPanel.Dock="Bottom"></FlowDocumentScrollViewer>-->
+    </Grid>
+</Window>
+

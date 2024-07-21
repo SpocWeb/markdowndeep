@@ -1,477 +1,102 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{CD1F5BFF-0118-4994-86A2-92658A36CE1B}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MarkdownDeepTests</RootNamespace>
-    <AssemblyName>MarkdownDeepTests</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <OldToolsVersion>3.5</OldToolsVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.5.10.11092\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.mocks">
-      <HintPath>..\packages\NUnit.2.5.10.11092\lib\nunit.mocks.dll</HintPath>
-    </Reference>
-    <Reference Include="pnunit.framework">
-      <HintPath>..\packages\NUnit.2.5.10.11092\lib\pnunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="BlockProcessorTests.cs" />
-    <Compile Include="CodeSpanTests.cs" />
-    <Compile Include="AutoLinkTests.cs" />
-    <Compile Include="AutoHeaderIDTests.cs" />
-    <Compile Include="TableSpecTests.cs" />
-    <Compile Include="ExtraMode.cs" />
-    <Compile Include="SafeModeTests.cs" />
-    <Compile Include="JavascriptTests.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MoreTestFiles.cs" />
-    <Compile Include="LinkAndImgTests.cs" />
-    <Compile Include="SpanLevelTests.cs" />
-    <Compile Include="EscapeCharacterTests.cs" />
-    <Compile Include="LinkDefinitionTests.cs" />
-    <Compile Include="SpecialCharacterTests.cs" />
-    <Compile Include="HtmlTagTests.cs" />
-    <Compile Include="BlockLevelTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EmphasisTests.cs" />
-    <Compile Include="StringScannerTests.cs" />
-    <Compile Include="Utils.cs" />
-    <Compile Include="XssAttackTests.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MarkdownDeep\MarkdownDeep.csproj">
-      <Project>{1569ED47-C7C9-4261-B6F4-7445BD0F2C95}</Project>
-      <Name>MarkdownDeep</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\SimpleParagraph.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\SimpleParagraph.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HardWrappedParagraph.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HardWrappedParagraph.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\MultipleParagraphs.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\MultipleParagraphs.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\SimpleOrderedList.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\SimpleOrderedList.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\SimpleUnorderedList.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\SimpleUnorderedList.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\CodeBlocks.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\CodeBlocks.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\QuoteBlocks.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\QuoteBlocks.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\QuoteBlocksNested.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\QuoteBlocksNested.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HtmlBlock.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HtmlBlock.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\ParagraphBreaks.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\ParagraphBreaks.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\AtxHeadings.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\AtxHeadings.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\SetExtHeadings.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\SetExtHeadings.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HardWrappedListItems.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HardWrappedListItems.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HardWrappedParagraphWithListLikeLine.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HardWrappedParagraphWithListLikeLine.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\ComplexListItems.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\ComplexListItems.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HardWrappedParagraphInListItem.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HardWrappedParagraphInListItem.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\ImplicitReferenceLinkWithTitle.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\ImplicitReferenceLinkWithTitle.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\ImplicitReferenceLinkWithoutTitle.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\ImplicitReferenceLinkWithoutTitle.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\ExplicitReferenceLinkWithTitle.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\ExplicitReferenceLinkWithTitle.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\ExplicitReferenceLinkWithoutTitle.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\ExplicitReferenceLinkWithoutTitle.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\HtmlEncodeLinks.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\HtmlEncodeLinks.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\InlineLinkWithTitle.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\InlineLinkWithTitle.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\xsstests\xss_attacks.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\xsstests\non_attacks.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\mdtest11\Amps_and_angle_encoding.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Auto_links.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Backslash_escapes.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Blockquotes_with_code_blocks.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Code_Blocks.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Code_Spans.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Hard_wrapped_paragraphs_with_list_like_lines.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Horizontal_rules.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Images.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Inline_HTML_Advanced.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Inline_HTML_comments.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Inline_HTML_Simple.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Links_inline_style.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Links_reference_style.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Links_shortcut_references.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Literal_quotes_in_titles.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Markdown_Documentation_Basics.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Markdown_Documentation_Syntax.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Nested_blockquotes.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Ordered_and_unordered_lists.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Strong_and_em_together.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Tabs.html" />
-    <EmbeddedResource Include="testfiles\mdtest11\Tidyness.html" />
-    <EmbeddedResource Include="testfiles\mdtest01\code-inside-list.html" />
-    <EmbeddedResource Include="testfiles\mdtest01\line-endings-cr.html" />
-    <EmbeddedResource Include="testfiles\mdtest01\line-endings-crlf.html" />
-    <EmbeddedResource Include="testfiles\mdtest01\line-endings-lf.html" />
-    <EmbeddedResource Include="testfiles\mdtest01\markdown-readme.html" />
-    <EmbeddedResource Include="testfiles\pandoc\failure-to-escape-less-than.html" />
-    <EmbeddedResource Include="testfiles\pandoc\nested-divs.html" />
-    <EmbeddedResource Include="testfiles\pandoc\nested-emphasis.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Backslash escapes.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Code block in a list item.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Code Spans.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Email auto links.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Emphasis.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Headers.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Horizontal Rules.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Inline HTML %28Simple%29.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Inline HTML %28Span%29.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Inline HTML comments.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Ins &amp; del.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Links, inline style.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\MD5 Hashes.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Nesting.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Parens in URL.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\PHP-Specific Bugs.html" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Tight blocks.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\mdtest11\Amps_and_angle_encoding.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Auto_links.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Backslash_escapes.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Blockquotes_with_code_blocks.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Code_Blocks.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Code_Spans.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Hard_wrapped_paragraphs_with_list_like_lines.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Horizontal_rules.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Images.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Inline_HTML_Advanced.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Inline_HTML_comments.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Inline_HTML_Simple.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Links_inline_style.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Links_reference_style.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Links_shortcut_references.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Literal_quotes_in_titles.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Markdown_Documentation_Basics.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Markdown_Documentation_Syntax.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Nested_blockquotes.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Ordered_and_unordered_lists.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Strong_and_em_together.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Tabs.text" />
-    <EmbeddedResource Include="testfiles\mdtest11\Tidyness.text" />
-    <EmbeddedResource Include="testfiles\mdtest01\code-inside-list.text" />
-    <EmbeddedResource Include="testfiles\mdtest01\line-endings-cr.text" />
-    <EmbeddedResource Include="testfiles\mdtest01\line-endings-crlf.text" />
-    <EmbeddedResource Include="testfiles\mdtest01\line-endings-lf.text" />
-    <EmbeddedResource Include="testfiles\mdtest01\markdown-readme.text" />
-    <EmbeddedResource Include="testfiles\pandoc\failure-to-escape-less-than.text" />
-    <EmbeddedResource Include="testfiles\pandoc\indented-code-in-list-item.text" />
-    <EmbeddedResource Include="testfiles\pandoc\nested-divs.text" />
-    <EmbeddedResource Include="testfiles\pandoc\nested-emphasis.text" />
-    <EmbeddedResource Include="testfiles\pandoc\unordered-list-and-horizontal-rules.text" />
-    <EmbeddedResource Include="testfiles\pandoc\unordered-list-followed-by-ordered-list.text" />
-    <EmbeddedResource Include="testfiles\pandoc\unpredictable-sublists.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Backslash escapes.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Code block in a list item.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Code Spans.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Email auto links.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Emphasis.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Headers.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Horizontal Rules.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Inline HTML %28Simple%29.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Inline HTML %28Span%29.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Inline HTML comments.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Ins &amp; del.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Links, inline style.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\MD5 Hashes.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Nesting.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Parens in URL.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\PHP-Specific Bugs.text" />
-    <EmbeddedResource Include="testfiles\phpmarkdown\Tight blocks.text" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\InsTypes.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\InsTypes.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\LinkTitlesWithEmbeddedQuotes.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\LinkTitlesWithEmbeddedQuotes.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HtmlComments.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\HtmlComments.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\EscapesInUrls.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\EscapesInUrls.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\NestedListItems.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\blocktests\NestedListItems.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\ReferenceLinkWithIDOnNextLine.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\ReferenceLinkWithIDOnNextLine.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\FormattingInLinkText.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\FormattingInLinkText.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\pandoc\indented-code-in-list-item.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\pandoc\unordered-list-and-horizontal-rules.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\pandoc\unordered-list-followed-by-ordered-list.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\pandoc\unpredictable-sublists.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\Emphasis.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="testfiles\spantests\Emphasis.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MarkdownDeepTests.dll.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="JSTestResources\JSHost.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="JSTestResources\MarkdownDeep.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="JSTestResources\MarkdownDeep.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <EmbeddedResource Include="testfiles\extramode\Issue26%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\Issue26%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\Issue30%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\Issue30%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\FencedCodeBlocksAlt%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\FencedCodeBlocksAlt%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\Issue12%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\Issue12%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\blocktests\PartiallyIndentedLists.html" />
-    <EmbeddedResource Include="testfiles\blocktests\PartiallyIndentedLists.txt" />
-    <EmbeddedResource Include="testfiles\blocktests\HtmlAttributeWithoutValue.txt" />
-    <EmbeddedResource Include="testfiles\blocktests\HtmlAttributeWithoutValue.html" />
-    <EmbeddedResource Include="testfiles\spantests\LinkedImage.txt" />
-    <EmbeddedResource Include="testfiles\spantests\LinkedImage.html" />
-    <EmbeddedResource Include="testfiles\spantests\BackslashEscapes.txt" />
-    <EmbeddedResource Include="testfiles\spantests\BackslashEscapes.html" />
-    <EmbeddedResource Include="testfiles\extramode\BackslashEscapes%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\BackslashEscapes%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\Emphasis%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\Emphasis%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\Abbreviations%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\Abbreviations%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\Footnotes%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\Footnotes%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\DefinitionLists%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\DefinitionLists%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\TableFormatting%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\TableFormatting%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\TableAlignment%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\TableAlignment%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\Tables%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\Tables%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\FencedCodeBlocks%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\FencedCodeBlocks%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\HeaderIDs%28ExtraMode%29%28AutoHeadingIDs%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\HeaderIDs%28ExtraMode%29%28AutoHeadingIDs%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\HeaderIDs%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\HeaderIDs%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\MarkdownInHtml-DeepNested%28ExtraMode%29%28MarkdownInHtml%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\MarkdownInHtml-DeepNested%28ExtraMode%29%28MarkdownInHtml%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\MarkdownInHtml-DeepNested%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\MarkdownInHtml-DeepNested%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\MarkdownInHtml-Nested%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\extramode\MarkdownInHtml-Nested%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\MarkdownInHtml%28ExtraMode%29.txt" />
-    <EmbeddedResource Include="testfiles\extramode\MarkdownInHtml%28ExtraMode%29.html" />
-    <EmbeddedResource Include="testfiles\safemode\Basic%28SafeMode%29.txt" />
-    <EmbeddedResource Include="testfiles\safemode\Basic%28SafeMode%29.html" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <PropertyGroup>
-    <PostBuildEvent>xcopy /D /Y "$(SolutionDir)MarkdownDeepJS\*.js" "$(ProjectDir)JSTestResources"</PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent>rem nuget.exe install $(ProjectDir)packages.config -o $(ProjectDir)..\Packages</PreBuildEvent>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<DefaultItemExcludes>$(DefaultItemExcludes);**\*.vrn;**\*.vrn.zip</DefaultItemExcludes>
+		<EnableDefaultItems>true</EnableDefaultItems>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<!--<GenerateAssemblyInfo>false</GenerateAssemblyInfo> 
+			prevents generating 
+			* AssemblyVersionAttribute.
+			* AssemblyFileVersionAttribute
+			* AssemblyInformationalVersionAttribute
+			* AssemblyTitleAttribute
+			* AssemblyDescriptionAttribute
+		-->
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="_Resources\**\*" Exclude="**\*.vrn;**\*.vrn.zip">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<TargetFrameworks>net48;net8.0</TargetFrameworks>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\..\..\..\NET\org.SpocWeb.snk</AssemblyOriginatorKeyFile>
+		<RootNamespace>$(MSBuildProjectName)</RootNamespace>
+		<Platforms>AnyCPU;x86</Platforms>
+		<DefineConstants>TRACE;STD20 NUNIT DOTNET4 INPUTS NET_4_5 HAVE_ASYNC HAVE_LINQ HAVE_BIG_INTEGER_NO HAVE_DYNAMIC HAVE_ICLONEABLE HAVE_VARIANT_TYPE_PARAMETERS HAVE_COMPONENT_MODEL HAVE_ICONVERTIBLE HAVE_BINARY_EXCEPTION_SERIALIZATION HAVE_INOTIFY_COLLECTION_CHANGED HAVE_INOTIFY_PROPERTY_CHANGING HAVE_DATE_TIME_OFFSET HAVE_TYPE_DESCRIPTOR HAVE_DB_NULL_TYPE_CODE HAVE_HASH_SET HAVE_NO_FAST_REVERSE HAVE_XML_DOCUMENT HAVE_XLINQ HAS_CUSTOM_DOUBLE_PARSE HAVE_EXPRESSIONS  DOTNET5</DefineConstants>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<OutputType>Exe</OutputType>
+		<StartupObject>MarkdownDeepTests.Program</StartupObject>
+
+		<Description>Fundamental Interfaces, Delegates, Enums and Base Classes for any Domain</Description>
+		<PackageProjectUrl>http://Spoc-Web.com</PackageProjectUrl>
+		<PackageTags>Spoc-Web;Interfaces;</PackageTags>
+		<PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+		<PackageLicenseExpression>Hippocratic-2.1</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>latest-minimum</AnalysisLevel>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<RepositoryUrl>https://github.com/SpocWeb/SpocWeb.IMaths</RepositoryUrl>
+		<!--PackageReadmeFile>ReadMe.md</PackageReadmeFile-->
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="files\**" />
+	  <EmbeddedResource Remove="files\**" />
+	  <None Remove="files\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="groups\IdentityFunction.cs" />
+	  <Compile Remove="MardownDeep.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Microsoft.CSharp">
+			<HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\Microsoft.CSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="System.ComponentModel.DataAnnotations" />
+		<Reference Include="System.Numerics.Vectors">
+			<HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\System.Numerics.Vectors.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="coverlet.collector" Version="3.1.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
+		<PackageReference Include="NullGuard.Fody" Version="3.1.0" />
+		<PackageReference Include="NUnit" Version="3.14.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
+		<PackageReference Include="System.Drawing.Common" Version="8.0.7" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="_Links\" />
+	  <Folder Include="Properties\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\..\..\NET\org.SpocWeb.snk" Link="_Links\org.SpocWeb.snk" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\MarkdownDeep\MarkdownDeep.csproj" />
+	</ItemGroup>
+
 </Project>

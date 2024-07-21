@@ -1,144 +1,120 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using MarkdownDeep;
 using NUnit.Framework;
-using MarkdownDeep;
 
-namespace MarkdownDeepTests
-{
+namespace MarkdownDeepTests {
+
 	[TestFixture]
-	class HtmlTagTests
-	{
+	internal class HtmlTagTests {
 		[SetUp]
-		public void SetUp()
-		{
-			m_pos = 0;
+		public void SetUp() => _Pos = 0;
+
+		int _Pos;
+
+		[Test]
+		public void Closed() {
+			const string str = "<div/>";
+			HtmlTag tag = str.ParseHtml(ref _Pos);
+
+			Assert.AreEqual(tag.Name, "div");
+			Assert.AreEqual(tag.IsClosing, false);
+			Assert.AreEqual(tag.IsClosed, true);
+			Assert.AreEqual(tag.Attributes.Count, 0);
+			Assert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
-		public void Unquoted()
-		{
-			string str = @"<div x=1 y=2>";
-			HtmlTag tag = HtmlTag.Parse(str, ref m_pos);
+		public void ClosedWithAttribs() {
+			const string str = "<div x=1 y=2/>";
+			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.name, "div");
-			Assert.AreEqual(tag.closing, false);
-			Assert.AreEqual(tag.closed, false);
-			Assert.AreEqual(tag.attributes.Count, 2);
-			Assert.AreEqual(tag.attributes["x"], "1");
-			Assert.AreEqual(tag.attributes["y"], "2");
-			Assert.AreEqual(m_pos, str.Length);
-
+			Assert.AreEqual(tag.Name, "div");
+			Assert.AreEqual(tag.IsClosing, false);
+			Assert.AreEqual(tag.IsClosed, true);
+			Assert.AreEqual(tag.Attributes.Count, 2);
+			Assert.AreEqual(tag.Attributes["x"], "1");
+			Assert.AreEqual(tag.Attributes["y"], "2");
+			Assert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
-		public void Quoted()
-		{
-			string str = @"<div x=""1"" y=""2"">";
-			HtmlTag tag = HtmlTag.Parse(str, ref m_pos);
+		public void Closing() {
+			const string str = "</div>";
+			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.name, "div");
-			Assert.AreEqual(tag.closing, false);
-			Assert.AreEqual(tag.closed, false);
-			Assert.AreEqual(tag.attributes.Count, 2);
-			Assert.AreEqual(tag.attributes["x"], "1");
-			Assert.AreEqual(tag.attributes["y"], "2");
-			Assert.AreEqual(m_pos, str.Length);
-
+			Assert.AreEqual(tag.Name, "div");
+			Assert.AreEqual(tag.IsClosing, true);
+			Assert.AreEqual(tag.IsClosed, false);
+			Assert.AreEqual(tag.Attributes.Count, 0);
+			Assert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
-		public void Empty()
-		{
-			string str = @"<div>";
-			HtmlTag tag = HtmlTag.Parse(str, ref m_pos);
+		public void Comment() {
+			const string str = "<!-- comment -->";
+			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.name, "div");
-			Assert.AreEqual(tag.closing, false);
-			Assert.AreEqual(tag.closed, false);
-			Assert.AreEqual(tag.attributes.Count, 0);
-			Assert.AreEqual(m_pos, str.Length);
-
+			Assert.AreEqual(tag.Name, "!");
+			Assert.AreEqual(tag.IsClosing, false);
+			Assert.AreEqual(tag.IsClosed, true);
+			Assert.AreEqual(tag.Attributes.Count, 1);
+			Assert.AreEqual(tag.Attributes["content"], " comment ");
+			Assert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
-		public void Closed()
-		{
-			string str = @"<div/>";
-			HtmlTag tag = HtmlTag.Parse(str, ref m_pos);
+		public void Empty() {
+			const string str = "<div>";
+			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.name, "div");
-			Assert.AreEqual(tag.closing, false);
-			Assert.AreEqual(tag.closed, true);
-			Assert.AreEqual(tag.attributes.Count, 0);
-			Assert.AreEqual(m_pos, str.Length);
-
+			Assert.AreEqual(tag.Name, "div");
+			Assert.AreEqual(tag.IsClosing, false);
+			Assert.AreEqual(tag.IsClosed, false);
+			Assert.AreEqual(tag.Attributes.Count, 0);
+			Assert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
-		public void ClosedWithAttribs()
-		{
-			string str = @"<div x=1 y=2/>";
-			HtmlTag tag = HtmlTag.Parse(str, ref m_pos);
+		public void NonValuedAttribute() {
+			const string str = "<iframe y='2' allowfullscreen x='1' foo>";
+			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.name, "div");
-			Assert.AreEqual(tag.closing, false);
-			Assert.AreEqual(tag.closed, true);
-			Assert.AreEqual(tag.attributes.Count, 2);
-			Assert.AreEqual(tag.attributes["x"], "1");
-			Assert.AreEqual(tag.attributes["y"], "2");
-			Assert.AreEqual(m_pos, str.Length);
-
+			Assert.AreEqual(tag.Name, "iframe");
+			Assert.AreEqual(tag.IsClosing, false);
+			Assert.AreEqual(tag.IsClosed, false);
+			Assert.AreEqual(tag.Attributes.Count, 4);
+			Assert.AreEqual(tag.Attributes["allowfullscreen"], "");
+			Assert.AreEqual(tag.Attributes["foo"], "");
+			Assert.AreEqual(tag.Attributes["y"], "2");
+			Assert.AreEqual(tag.Attributes["x"], "1");
+			Assert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
-		public void Closing()
-		{
-			string str = @"</div>";
-			HtmlTag tag = HtmlTag.Parse(str, ref m_pos);
+		public void Quoted() {
+			const string str = "<div x=\"1\" y=\"2\">";
+			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.name, "div");
-			Assert.AreEqual(tag.closing, true);
-			Assert.AreEqual(tag.closed, false);
-			Assert.AreEqual(tag.attributes.Count, 0);
-			Assert.AreEqual(m_pos, str.Length);
-
+			Assert.AreEqual(tag.Name, "div");
+			Assert.AreEqual(tag.IsClosing, false);
+			Assert.AreEqual(tag.IsClosed, false);
+			Assert.AreEqual(tag.Attributes.Count, 2);
+			Assert.AreEqual(tag.Attributes["x"], "1");
+			Assert.AreEqual(tag.Attributes["y"], "2");
+			Assert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
-		public void Comment()
-		{
-			string str = @"<!-- comment -->";
-			HtmlTag tag = HtmlTag.Parse(str, ref m_pos);
+		public void Unquoted() {
+			const string str = "<div x=1 y=2>";
+			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.name, "!");
-			Assert.AreEqual(tag.closing, false);
-			Assert.AreEqual(tag.closed, true);
-			Assert.AreEqual(tag.attributes.Count, 1);
-			Assert.AreEqual(tag.attributes["content"], " comment ");
-			Assert.AreEqual(m_pos, str.Length);
+			Assert.AreEqual(tag.Name, "div");
+			Assert.AreEqual(tag.IsClosing, false);
+			Assert.AreEqual(tag.IsClosed, false);
+			Assert.AreEqual(tag.Attributes.Count, 2);
+			Assert.AreEqual(tag.Attributes["x"], "1");
+			Assert.AreEqual(tag.Attributes["y"], "2");
+			Assert.AreEqual(_Pos, str.Length);
 		}
-
-		[Test]
-		public void NonValuedAttribute()
-		{
-			string str = @"<iframe y=""2"" allowfullscreen x=""1"" foo>";
-			HtmlTag tag = HtmlTag.Parse(str, ref m_pos);
-
-			Assert.AreEqual(tag.name, "iframe");
-			Assert.AreEqual(tag.closing, false);
-			Assert.AreEqual(tag.closed, false);
-			Assert.AreEqual(tag.attributes.Count, 4);
-			Assert.AreEqual(tag.attributes["allowfullscreen"], "");
-			Assert.AreEqual(tag.attributes["foo"], "");
-			Assert.AreEqual(tag.attributes["y"], "2");
-			Assert.AreEqual(tag.attributes["x"], "1");
-			Assert.AreEqual(m_pos, str.Length);
-
-		}
-
-		int m_pos;
-
 	}
 }

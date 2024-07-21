@@ -1,0 +1,103 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<DefaultItemExcludes>$(DefaultItemExcludes);**\*.vrn;**\*.vrn.zip</DefaultItemExcludes>
+		<EnableDefaultItems>true</EnableDefaultItems>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<!--<GenerateAssemblyInfo>false</GenerateAssemblyInfo> 
+			prevents generating 
+			* AssemblyVersionAttribute.
+			* AssemblyFileVersionAttribute
+			* AssemblyInformationalVersionAttribute
+			* AssemblyTitleAttribute
+			* AssemblyDescriptionAttribute
+		-->
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="_Resources\**\*" Exclude="**\*.vrn;**\*.vrn.zip">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<TargetFrameworks>net48;net8.0</TargetFrameworks>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\..\..\..\NET\org.SpocWeb.snk</AssemblyOriginatorKeyFile>
+		<RootNamespace>$(MSBuildProjectName)</RootNamespace>
+		<Platforms>AnyCPU;x86</Platforms>
+		<DefineConstants>TRACE;STD20 NUNIT DOTNET4 INPUTS NET_4_5 HAVE_ASYNC HAVE_LINQ HAVE_BIG_INTEGER_NO HAVE_DYNAMIC HAVE_ICLONEABLE HAVE_VARIANT_TYPE_PARAMETERS HAVE_COMPONENT_MODEL HAVE_ICONVERTIBLE HAVE_BINARY_EXCEPTION_SERIALIZATION HAVE_INOTIFY_COLLECTION_CHANGED HAVE_INOTIFY_PROPERTY_CHANGING HAVE_DATE_TIME_OFFSET HAVE_TYPE_DESCRIPTOR HAVE_DB_NULL_TYPE_CODE HAVE_HASH_SET HAVE_NO_FAST_REVERSE HAVE_XML_DOCUMENT HAVE_XLINQ HAS_CUSTOM_DOUBLE_PARSE HAVE_EXPRESSIONS  DOTNET5</DefineConstants>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<OutputType>Exe</OutputType>
+		<StartupObject>MarkdownDeepTests.Program</StartupObject>
+
+		<Description>Fundamental Interfaces, Delegates, Enums and Base Classes for any Domain</Description>
+		<PackageProjectUrl>http://Spoc-Web.com</PackageProjectUrl>
+		<PackageTags>Spoc-Web;Interfaces;</PackageTags>
+		<PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+		<PackageLicenseExpression>Hippocratic-2.1</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>latest-minimum</AnalysisLevel>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<RepositoryUrl>https://github.com/SpocWeb/SpocWeb.IMaths</RepositoryUrl>
+		<!--PackageReadmeFile>ReadMe.md</PackageReadmeFile-->
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="files\**" />
+	  <EmbeddedResource Remove="files\**" />
+	  <None Remove="files\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="groups\IdentityFunction.cs" />
+	  <Compile Remove="MardownDeep.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Microsoft.CSharp">
+			<HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\Microsoft.CSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="PresentationFramework" />
+		<Reference Include="System.ComponentModel.DataAnnotations" />
+		<Reference Include="System.Numerics.Vectors">
+			<HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\System.Numerics.Vectors.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="coverlet.collector" Version="3.1.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
+		<PackageReference Include="NullGuard.Fody" Version="3.1.0" />
+		<PackageReference Include="NUnit" Version="3.14.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
+		<PackageReference Include="System.Drawing.Common" Version="8.0.7" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="_Links\" />
+	  <Folder Include="Properties\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\..\..\NET\org.SpocWeb.snk" Link="_Links\org.SpocWeb.snk" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\MarkdownDeep\MarkdownDeep.csproj" />
+	</ItemGroup>
+
+</Project>

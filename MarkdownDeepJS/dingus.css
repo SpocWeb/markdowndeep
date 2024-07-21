@@ -1,22 +1,12 @@
-body
-{
-	font-family: sans-serif;
+body { font-family: sans-serif; }
+
+.clear { clear: both; }
+
+textarea.mdd_editor {
+    color: #202020;
+    font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Courier New', Courier, monospace;
+    font-size: 10pt;
+    font-weight: normal;
 }
 
-.clear
-{
-	clear:both;
-}
-
-textarea.mdd_editor
-{
-	font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Courier New' , Courier, monospace;
-	font-weight:normal;
-	font-size: 10pt;
-	color:#202020;
-}
-
-#options
-{
-	display:none;
-}
+#options { display: none; }

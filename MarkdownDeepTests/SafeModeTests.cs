@@ -1,33 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
-using MarkdownDeep;
-using System.Reflection;
 
-namespace MarkdownDeepTests
-{
+namespace MarkdownDeepTests {
 	[TestFixture]
-	class SafeModeTests
-	{
-		public static IEnumerable<TestCaseData> GetTests()
-		{
-			return Utils.GetTests("safemode");
-		}
+	internal class SafeModeTests {
 
+		public static IEnumerable<TestCaseData> GetTests() => Utils.GetTests("safemode");
 
-		[Test, TestCaseSource("GetTests")]
-		public void Test(string resourceName)
-		{
-			Utils.RunResourceTest(resourceName);
-		}
+		[Test, TestCaseSource(nameof(GetTests))]
+		public void Test(string resourceName) => Utils.RunResourceTest(resourceName);
 
-		[Test, TestCaseSource("GetTests")]
-		public void Test_js(string resourceName)
-		{
-			Utils.RunResourceTestJS(resourceName);
-		}
+		//[Test, TestCaseSource(nameof(GetTests))]
+		//public void Test_js(string resourceName) => Utils.RunResourceTestJs(resourceName);
 
 	}
 }

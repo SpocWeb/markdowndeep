@@ -5,32 +5,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MarkdownDeep")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Topten Software")]
-[assembly: AssemblyProduct("MarkdownDeep")]
-[assembly: AssemblyCopyright("Copyright © 2010-2011 Topten Software")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("dddc6d83-efc4-4387-90e2-eabe9f5998dd")]
 
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.5.*")]
-[assembly: InternalsVisibleTo("MarkdownDeepTests")]
+[assembly: InternalsVisibleTo("MarkdownDeepTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001009f2c9baabb502021efe6867218b4c7a0aef15ef9323aad52e54946872a566506c542f9c9c0bb28a8117abb1658cd1c8699a7fa3228e5125d9dde89353d03e02896971d502854c807b062f717f85d637faeab1cec2ed6853a631e61d1418caafc73de157fe55020d5cbafddeefad752d658bcc2be560421a78a2a87f574ee99f0")]

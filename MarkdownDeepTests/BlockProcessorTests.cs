@@ -1,163 +1,159 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
+﻿using System.Collections.Generic;
 using MarkdownDeep;
+using NUnit.Framework;
 
-namespace MarkdownDeepTests
-{
+namespace MarkdownDeepTests {
 	[TestFixture]
-	class BlockProcessorTests
-	{
+	internal class BlockProcessorTests {
 		[SetUp]
-		public void Setup()
-		{
-			p = new BlockProcessor(new Markdown(), false);
-		}
+		public void Setup() => _P = new BlockParser(new Markdown(), false, false);
+
+		BlockParser _P;
 
 		[Test]
-		public void SingleLineParagraph()
-		{
-			var b = p.Process("paragraph");
-			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.p, b[0].blockType);
-			Assert.AreEqual("paragraph", b[0].Content);
-		}
-
-		[Test]
-		public void MultilineParagraph()
-		{
-			var b = p.Process("l1\nl2\n\n");
-			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.p, b[0].blockType);
-			Assert.AreEqual("l1\nl2", b[0].Content);
-		}
-
-		[Test]
-		public void SetExtH1()
-		{
-			var b = p.Process("heading\n===\n\n");
-			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.h1, b[0].blockType);
-			Assert.AreEqual("heading", b[0].Content);
-		}
-
-		[Test]
-		public void SetExtH2()
-		{
-			var b = p.Process("heading\n---\n\n");
-			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.h2, b[0].blockType);
-			Assert.AreEqual("heading", b[0].Content);
-		}
-
-		[Test]
-		public void SetExtHeadingInParagraph()
-		{
-			var b = p.Process("p1\nheading\n---\np2\n");
-			Assert.AreEqual(3, b.Count);
-
-			Assert.AreEqual(BlockType.p, b[0].blockType);
-			Assert.AreEqual("p1", b[0].Content);
-
-			Assert.AreEqual(BlockType.h2, b[1].blockType);
-			Assert.AreEqual("heading", b[1].Content);
-
-			Assert.AreEqual(BlockType.p, b[2].blockType);
-			Assert.AreEqual("p2", b[2].Content);
-		}
-
-		[Test]
-		public void AtxHeaders()
-		{
-			var b = p.Process("#heading#\nparagraph\n");
+		public void AtxHeaders() {
+			List<Block> b = _P.Process("#heading#\nparagraph\n");
 			Assert.AreEqual(2, b.Count);
 
-			Assert.AreEqual(BlockType.h1, b[0].blockType);
+			Assert.AreEqual(BlockType.h1, b[0]._BlockType);
 			Assert.AreEqual("heading", b[0].Content);
 
-			Assert.AreEqual(BlockType.p, b[1].blockType);
+			Assert.AreEqual(BlockType.p, b[1]._BlockType);
 			Assert.AreEqual("paragraph", b[1].Content);
 		}
 
 		[Test]
-		public void AtxHeadingInParagraph()
-		{
-			var b = p.Process("p1\n## heading ##\np2\n");
+		public void NestedBlocks() {
+			List<Block> blocks = _P.Process(
+@"*   [Miscellaneous](#misc)
+    *   [Backslash Escapes](#backslash)
+    *   [Automatic Links](#autolink)
+
+**Note:** This document is itself writtn using Markdown; you
+");
+			Assert.AreEqual(2, blocks.Count);
+
+			Assert.AreEqual(BlockType.ul, blocks[0]._BlockType);
+			Assert.AreEqual(2, blocks[0]._Children.Count);
+
+		}
+
+		[Test]
+		public void AtxHeadingInParagraph() {
+			List<Block> b = _P.Process("p1\n## heading ##\np2\n");
 
 			Assert.AreEqual(3, b.Count);
 
-			Assert.AreEqual(BlockType.p, b[0].blockType);
+			Assert.AreEqual(BlockType.p, b[0]._BlockType);
 			Assert.AreEqual("p1", b[0].Content);
 
-			Assert.AreEqual(BlockType.h2, b[1].blockType);
+			Assert.AreEqual(BlockType.h2, b[1]._BlockType);
 			Assert.AreEqual("heading", b[1].Content);
 
-			Assert.AreEqual(BlockType.p, b[2].blockType);
+			Assert.AreEqual(BlockType.p, b[2]._BlockType);
 			Assert.AreEqual("p2", b[2].Content);
 		}
 
 		[Test]
-		public void CodeBlock()
-		{
-			var b = p.Process("\tcode1\n\t\tcode2\n\tcode3\nparagraph");
+		public void CodeBlock() {
+			List<Block> b = _P.Process("\tcode1\n\t\tcode2\n\tcode3\nparagraph");
 			Assert.AreEqual(2, b.Count);
 
-			Block cb = b[0] as Block;
+			Block cb = b[0];
 			Assert.AreEqual("code1\n\tcode2\ncode3\n", cb.Content);
 
-			Assert.AreEqual(BlockType.p, b[1].blockType);
+			Assert.AreEqual(BlockType.p, b[1]._BlockType);
 			Assert.AreEqual("paragraph", b[1].Content);
 		}
 
 		[Test]
-		public void HtmlBlock()
-		{
-			var b = p.Process("<div>\n</div>\n");
+		public void HorizontalRules() {
+			List<Block> b = _P.Process("---\n");
 			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.html, b[0].blockType);
+			Assert.AreEqual(BlockType.hr, b[0]._BlockType);
+
+			b = _P.Process("___\n");
+			Assert.AreEqual(1, b.Count);
+			Assert.AreEqual(BlockType.hr, b[0]._BlockType);
+
+			b = _P.Process("***\n");
+			Assert.AreEqual(1, b.Count);
+			Assert.AreEqual(BlockType.hr, b[0]._BlockType);
+
+			b = _P.Process(" - - - \n");
+			Assert.AreEqual(1, b.Count);
+			Assert.AreEqual(BlockType.hr, b[0]._BlockType);
+
+			b = _P.Process("  _ _ _ \n");
+			Assert.AreEqual(1, b.Count);
+			Assert.AreEqual(BlockType.hr, b[0]._BlockType);
+
+			b = _P.Process(" * * * \n");
+			Assert.AreEqual(1, b.Count);
+			Assert.AreEqual(BlockType.hr, b[0]._BlockType);
+		}
+
+		[Test]
+		public void HtmlBlock() {
+			List<Block> b = _P.Process("<div>\n</div>\n");
+			Assert.AreEqual(1, b.Count);
+			Assert.AreEqual(BlockType.html, b[0]._BlockType);
 			Assert.AreEqual("<div>\n</div>\n", b[0].Content);
 		}
 
 		[Test]
-		public void HtmlCommentBlock()
-		{
-			var b = p.Process("<!-- this is a\ncomments -->\n");
+		public void HtmlCommentBlock() {
+			List<Block> b = _P.Process("<!-- this is a\ncomments -->\n");
 			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.html, b[0].blockType);
+			Assert.AreEqual(BlockType.html, b[0]._BlockType);
 			Assert.AreEqual("<!-- this is a\ncomments -->\n", b[0].Content);
 		}
 
 		[Test]
-		public void HorizontalRules()
-		{
-			var b = p.Process("---\n");
+		public void MultilineParagraph() {
+			List<Block> b = _P.Process("l1\nl2\n\n");
 			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.hr, b[0].blockType);
-
-			b = p.Process("___\n");
-			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.hr, b[0].blockType);
-
-			b = p.Process("***\n");
-			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.hr, b[0].blockType);
-
-			b = p.Process(" - - - \n");
-			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.hr, b[0].blockType);
-
-			b = p.Process("  _ _ _ \n");
-			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.hr, b[0].blockType);
-
-			b = p.Process(" * * * \n");
-			Assert.AreEqual(1, b.Count);
-			Assert.AreEqual(BlockType.hr, b[0].blockType);
+			Assert.AreEqual(BlockType.p, b[0]._BlockType);
+			Assert.AreEqual("l1\nl2", b[0].Content);
 		}
 
+		[Test]
+		public void SetExtH1() {
+			List<Block> b = _P.Process("heading\n===\n\n");
+			Assert.AreEqual(1, b.Count);
+			Assert.AreEqual(BlockType.h1, b[0]._BlockType);
+			Assert.AreEqual("heading", b[0].Content);
+		}
 
-		BlockProcessor p;
+		[Test]
+		public void SetExtH2() {
+			List<Block> b = _P.Process("heading\n---\n\n");
+			Assert.AreEqual(1, b.Count);
+			Assert.AreEqual(BlockType.h2, b[0]._BlockType);
+			Assert.AreEqual("heading", b[0].Content);
+		}
+
+		[Test]
+		public void SetExtHeadingInParagraph() {
+			List<Block> b = _P.Process("p1\nheading\n---\np2\n");
+			Assert.AreEqual(3, b.Count);
+
+			Assert.AreEqual(BlockType.p, b[0]._BlockType);
+			Assert.AreEqual("p1", b[0].Content);
+
+			Assert.AreEqual(BlockType.h2, b[1]._BlockType);
+			Assert.AreEqual("heading", b[1].Content);
+
+			Assert.AreEqual(BlockType.p, b[2]._BlockType);
+			Assert.AreEqual("p2", b[2].Content);
+		}
+
+		[Test]
+		public void SingleLineParagraph() {
+			List<Block> b = _P.Process("paragraph");
+			Assert.AreEqual(1, b.Count);
+			Assert.AreEqual(BlockType.p, b[0]._BlockType);
+			Assert.AreEqual("paragraph", b[0].Content);
+		}
 	}
 }

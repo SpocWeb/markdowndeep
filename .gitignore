@@ -14,3 +14,4 @@ Debug
 *.nupkg
 *.lock.json
 /packages/*
+.vs

@@ -16,7 +16,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Markdown
 
-var MarkdownDeep = new function () {
+var MarkdownDeep = new function() {
 
 
     function array_indexOf(array, obj) {
@@ -59,6 +59,7 @@ var MarkdownDeep = new function () {
         FormatCodeBlockAttributes: null,
         FormatCodeBlock: null,
         ExtractHeadBlocks: false,
+        UserBreaks: false,
         HeadBlockContent: ""
     };
 
@@ -68,7 +69,7 @@ var MarkdownDeep = new function () {
         return dest.slice(0, position).concat(ins).concat(dest.slice(position + del));
     }
 
-    Markdown.prototype.GetListItems = function (input, offset) {
+    Markdown.prototype.GetListItems = function(input, offset) {
         // Parse content into blocks
         var blocks = this.ProcessBlocks(input);
 
@@ -113,16 +114,13 @@ var MarkdownDeep = new function () {
         i++;
         if (i < blocks.length) {
             list.push(blocks[i].lineStart);
-        }
-        else {
+        } else {
             list.push(input.length);
         }
 
         return list;
-    }
-
-    // Main entry point    
-    Markdown.prototype.Transform = function (input) {
+    }; // Main entry point    
+    Markdown.prototype.Transform = function(input) {
         // Normalize line ends
         var rpos = input.indexOf("\r");
         if (rpos >= 0) {
@@ -130,8 +128,7 @@ var MarkdownDeep = new function () {
             if (npos >= 0) {
                 if (npos < rpos) {
                     input = input.replace(/\n\r/g, "\n");
-                }
-                else {
+                } else {
                     input = input.replace(/\r\n/g, "\n");
                 }
             }
@@ -150,9 +147,9 @@ var MarkdownDeep = new function () {
                 list.push(this.m_Abbreviations[a]);
             }
             list.sort(
-		        function (a, b) {
-		            return b.Abbr.length - a.Abbr.length;
-		        }
+                function(a, b) {
+                    return b.Abbr.length - a.Abbr.length;
+                }
             );
             this.m_Abbreviations = list;
         }
@@ -190,8 +187,7 @@ var MarkdownDeep = new function () {
                 if (child.blockType == BlockType_p) {
                     child.blockType = BlockType_p_footnote;
                     child.data = strReturnLink;
-                }
-                else {
+                } else {
                     child = new Block();
                     child.contentLen = 0;
                     child.blockType = BlockType_p_footnote;
@@ -211,9 +207,8 @@ var MarkdownDeep = new function () {
 
         // Done
         return sb.ToString();
-    }
-
-    Markdown.prototype.OnQualifyUrl = function (url) {
+    };
+    Markdown.prototype.OnQualifyUrl = function(url) {
         // Is the url a fragment?
         if (starts_with(url, "#"))
             return url;
@@ -245,8 +240,7 @@ var MarkdownDeep = new function () {
 
             // Join em
             return rootLocation + url;
-        }
-        else {
+        } else {
             // Quit if we don't have a base location
             if (!this.UrlBaseLocation)
                 return url;
@@ -256,15 +250,11 @@ var MarkdownDeep = new function () {
             else
                 return this.UrlBaseLocation + url;
         }
-    }
-
-
-    // Override and return an object with width and height properties
-    Markdown.prototype.OnGetImageSize = function (image, TitledImage) {
+    }; // Override and return an object with width and height properties
+    Markdown.prototype.OnGetImageSize = function(image, TitledImage) {
         return null;
-    }
-
-    Markdown.prototype.OnPrepareLink = function (tag) {
+    };
+    Markdown.prototype.OnPrepareLink = function(tag) {
         var url = tag.attributes["href"];
 
         // No follow?
@@ -280,15 +270,14 @@ var MarkdownDeep = new function () {
 
         // New window?
         if ((this.NewWindowForExternalLinks && IsUrlFullyQualified(url)) ||
-			 (this.NewWindowForLocalLinks && !IsUrlFullyQualified(url))) {
+        (this.NewWindowForLocalLinks && !IsUrlFullyQualified(url))) {
             tag.attributes["target"] = "_blank";
         }
 
         // Qualify url
         tag.attributes["href"] = this.OnQualifyUrl(url);
-    }
-
-    Markdown.prototype.OnPrepareImage = function (tag, TitledImage) {
+    };
+    Markdown.prototype.OnPrepareImage = function(tag, TitledImage) {
         // Try to determine width and height
         var size = this.OnGetImageSize(tag.attributes["src"], TitledImage);
         if (size != null) {
@@ -298,19 +287,53 @@ var MarkdownDeep = new function () {
 
         // Now qualify the url
         tag.attributes["src"] = this.OnQualifyUrl(tag.attributes["src"]);
-    }
-
-    // Get a link definition
-    Markdown.prototype.GetLinkDefinition = function (id) {
+    }; // Get a link definition
+    Markdown.prototype.GetLinkDefinition = function(id) {
         if (this.m_LinkDefinitions.hasOwnProperty(id))
             return this.m_LinkDefinitions[id];
         else
             return null;
-    }
+    }; // Split the markdown into sections, one section for each
+    // top level heading
+    var SplitUserSections = function(markdown) {
 
+        // Build blocks
+        var md = new Markdown();
+        md.UserBreaks = true;
 
+        // Process blocks
+        var blocks = md.ProcessBlocks(markdown);
 
-    p.ProcessBlocks = function (str) {
+        // Create sections
+        var Sections = [];
+        var iPrevSectionOffset = 0;
+        for (var i = 0; i < blocks.length; i++) {
+            var b = blocks[i];
+            if (b.blockType == BlockType_user_break) {
+                // Get the offset of the section
+                var iSectionOffset = b.lineStart;
+
+                // Add section
+                Sections.push(markdown.substr(iPrevSectionOffset, iSectionOffset - iPrevSectionOffset).trim());
+
+                // Next section starts on next line
+                if (i + 1 < blocks.length) {
+                    iPrevSectionOffset = blocks[i + 1].lineStart;
+                    if (iPrevSectionOffset == 0)
+                        iPrevSectionOffset = blocks[i + 1].contentStart;
+                } else
+                    iPrevSectionOffset = markdown.length;
+            }
+        }
+
+        // Add the last section
+        if (markdown.length > iPrevSectionOffset) {
+            Sections.push(markdown.substring(iPrevSectionOffset).trim());
+        }
+
+        return Sections;
+    };
+    p.ProcessBlocks = function(str) {
         // Reset the list of link definitions
         this.m_LinkDefinitions = [];
         this.m_Footnotes = [];
@@ -320,19 +343,14 @@ var MarkdownDeep = new function () {
 
         // Process blocks
         return new BlockProcessor(this, this.MarkdownInHtml).Process(str);
-    }
-
-    // Add a link definition
-    p.AddLinkDefinition = function (link) {
+    }; // Add a link definition
+    p.AddLinkDefinition = function(link) {
         this.m_LinkDefinitions[link.id] = link;
-    }
-
-    p.AddFootnote = function (footnote) {
+    };
+    p.AddFootnote = function(footnote) {
         this.m_Footnotes[footnote.data] = footnote;
-    }
-
-    // Look up a footnote, claim it and return it's index (or -1 if not found)
-    p.ClaimFootnote = function (id) {
+    }; // Look up a footnote, claim it and return it's index (or -1 if not found)
+    p.ClaimFootnote = function(id) {
         var footnote = this.m_Footnotes[id];
         if (footnote != undefined) {
             // Move the foot note to the used footnote list
@@ -341,29 +359,21 @@ var MarkdownDeep = new function () {
 
             // Return it's display index
             return this.m_UsedFootnotes.length - 1;
-        }
-        else
+        } else
             return -1;
-    }
-
-    p.AddAbbreviation = function (abbr, title) {
+    };
+    p.AddAbbreviation = function(abbr, title) {
         if (this.m_Abbreviations == null) {
             this.m_Abbreviations = [];
         }
 
         // Store abbreviation
         this.m_Abbreviations[abbr] = { Abbr: abbr, Title: title };
-    }
-
-    p.GetAbbreviations = function () {
+    };
+    p.GetAbbreviations = function() {
         return this.m_Abbreviations;
-    }
-
-
-
-
-    // private
-    p.MakeUniqueHeaderID = function (strHeaderText, startOffset, length) {
+    }; // private
+    p.MakeUniqueHeaderID = function(strHeaderText, startOffset, length) {
         if (!this.AutoHeadingIDs)
             return null;
 
@@ -387,67 +397,70 @@ var MarkdownDeep = new function () {
 
         // Return it
         return strWithSuffix;
-    }
-
-
-    // private
-    p.GetStringBuilder = function () {
+    }; // private
+    p.GetStringBuilder = function() {
         this.m_StringBuilder.Clear();
         return this.m_StringBuilder;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////
+    }; /////////////////////////////////////////////////////////////////////////////
     // CharTypes
 
     function is_digit(ch) {
         return ch >= '0' && ch <= '9';
     }
+
     function is_hex(ch) {
         return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
     }
+
     function is_alpha(ch) {
         return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
     }
+
     function is_alphadigit(ch) {
         return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9');
     }
+
     function is_whitespace(ch) {
         return (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n');
     }
+
     function is_linespace(ch) {
         return (ch == ' ' || ch == '\t');
     }
+
     function is_lineend(ch) {
         return (ch == '\r' || ch == '\n');
     }
+
     function is_emphasis(ch) {
         return (ch == '*' || ch == '_');
     }
+
     function is_escapable(ch, ExtraMode) {
         switch (ch) {
-            case '\\':
-            case '`':
-            case '*':
-            case '_':
-            case '{':
-            case '}':
-            case '[':
-            case ']':
-            case '(':
-            case ')':
-            case '>':
-            case '#':
-            case '+':
-            case '-':
-            case '.':
-            case '!':
-                return true;
+        case '\\':
+        case '`':
+        case '*':
+        case '_':
+        case '{':
+        case '}':
+        case '[':
+        case ']':
+        case '(':
+        case ')':
+        case '>':
+        case '#':
+        case '+':
+        case '-':
+        case '.':
+        case '!':
+            return true;
 
-            case ':':
-            case '|':
-            case '=':
-            case '<':
-                return ExtraMode;
+        case ':':
+        case '|':
+        case '=':
+        case '<':
+            return ExtraMode;
         }
 
         return false;
@@ -471,12 +484,10 @@ var MarkdownDeep = new function () {
             if (str.charAt(pos) == 'x' || str.charAt(pos) == 'X') {
                 pos++;
                 fn_test = is_hex;
-            }
-            else {
+            } else {
                 fn_test = is_digit;
             }
-        }
-        else {
+        } else {
             fn_test = is_alphadigit;
         }
 
@@ -659,210 +670,200 @@ var MarkdownDeep = new function () {
 
     p = StringBuilder.prototype;
 
-    p.Append = function (value) {
+    p.Append = function(value) {
         if (value)
             this.m_content.push(value);
-    }
-    p.Clear = function () {
+    };
+    p.Clear = function() {
         this.m_content.length = 0;
-    }
-    p.ToString = function () {
+    };
+    p.ToString = function() {
         return this.m_content.join("");
-    }
-
-    p.HtmlRandomize = function (url) {
+    };
+    p.HtmlRandomize = function(url) {
         // Randomize
         var len = url.length;
         for (var i = 0; i < len; i++) {
             var x = Math.random();
             if (x > 0.90 && url.charAt(i) != '@') {
                 this.Append(url.charAt(i));
-            }
-            else if (x > 0.45) {
+            } else if (x > 0.45) {
                 this.Append("&#");
                 this.Append(url.charCodeAt(i).toString());
                 this.Append(";");
-            }
-            else {
+            } else {
                 this.Append("&#x");
                 this.Append(url.charCodeAt(i).toString(16));
                 this.Append(";");
             }
         }
-    }
-
-    p.HtmlEncode = function (str, startOffset, length) {
+    };
+    p.HtmlEncode = function(str, startOffset, length) {
         var end = startOffset + length;
         var piece = startOffset;
         var i;
         for (i = startOffset; i < end; i++) {
             switch (str.charAt(i)) {
-                case '&':
-                    if (i > piece)
+            case '&':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append("&amp;");
+                piece = i + 1;
+                break;
+
+            case '<':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append("&lt;");
+                piece = i + 1;
+                break;
+
+            case '>':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append("&gt;");
+                piece = i + 1;
+                break;
+
+            case '\"':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append("&quot;");
+                piece = i + 1;
+                break;
+            }
+        }
+
+        if (i > piece)
+            this.Append(str.substr(piece, i - piece));
+    };
+    p.SmartHtmlEncodeAmpsAndAngles = function(str, startOffset, length) {
+        var end = startOffset + length;
+        var piece = startOffset;
+        var i;
+        for (i = startOffset; i < end; i++) {
+            switch (str.charAt(i)) {
+            case '&':
+                var after = SkipHtmlEntity(str, i);
+                if (after < 0) {
+                    if (i > piece) {
                         this.Append(str.substr(piece, i - piece));
+                    }
                     this.Append("&amp;");
                     piece = i + 1;
-                    break;
+                } else {
+                    i = after - 1;
+                }
+                break;
 
-                case '<':
-                    if (i > piece)
-                        this.Append(str.substr(piece, i - piece));
-                    this.Append("&lt;");
-                    piece = i + 1;
-                    break;
+            case '<':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append("&lt;");
+                piece = i + 1;
+                break;
 
-                case '>':
-                    if (i > piece)
-                        this.Append(str.substr(piece, i - piece));
-                    this.Append("&gt;");
-                    piece = i + 1;
-                    break;
+            case '>':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append("&gt;");
+                piece = i + 1;
+                break;
 
-                case '\"':
-                    if (i > piece)
-                        this.Append(str.substr(piece, i - piece));
-                    this.Append("&quot;");
-                    piece = i + 1;
-                    break;
+            case '\"':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append("&quot;");
+                piece = i + 1;
+                break;
             }
         }
 
         if (i > piece)
             this.Append(str.substr(piece, i - piece));
-    }
-
-    p.SmartHtmlEncodeAmpsAndAngles = function (str, startOffset, length) {
+    };
+    p.SmartHtmlEncodeAmps = function(str, startOffset, length) {
         var end = startOffset + length;
         var piece = startOffset;
         var i;
         for (i = startOffset; i < end; i++) {
             switch (str.charAt(i)) {
-                case '&':
-                    var after = SkipHtmlEntity(str, i);
-                    if (after < 0) {
-                        if (i > piece) {
-                            this.Append(str.substr(piece, i - piece));
-                        }
-                        this.Append("&amp;");
-                        piece = i + 1;
+            case '&':
+                var after = SkipHtmlEntity(str, i);
+                if (after < 0) {
+                    if (i > piece) {
+                        this.Append(str.substr(piece, i - piece));
                     }
-                    else {
-                        i = after - 1;
-                    }
-                    break;
-
-                case '<':
-                    if (i > piece)
-                        this.Append(str.substr(piece, i - piece));
-                    this.Append("&lt;");
+                    this.Append("&amp;");
                     piece = i + 1;
-                    break;
-
-                case '>':
-                    if (i > piece)
-                        this.Append(str.substr(piece, i - piece));
-                    this.Append("&gt;");
-                    piece = i + 1;
-                    break;
-
-                case '\"':
-                    if (i > piece)
-                        this.Append(str.substr(piece, i - piece));
-                    this.Append("&quot;");
-                    piece = i + 1;
-                    break;
+                } else {
+                    i = after - 1;
+                }
+                break;
             }
         }
 
         if (i > piece)
             this.Append(str.substr(piece, i - piece));
-    }
-
-    p.SmartHtmlEncodeAmps = function (str, startOffset, length) {
-        var end = startOffset + length;
-        var piece = startOffset;
-        var i;
-        for (i = startOffset; i < end; i++) {
-            switch (str.charAt(i)) {
-                case '&':
-                    var after = SkipHtmlEntity(str, i);
-                    if (after < 0) {
-                        if (i > piece) {
-                            this.Append(str.substr(piece, i - piece));
-                        }
-                        this.Append("&amp;");
-                        piece = i + 1;
-                    }
-                    else {
-                        i = after - 1;
-                    }
-                    break;
-            }
-        }
-
-        if (i > piece)
-            this.Append(str.substr(piece, i - piece));
-    }
-
-
-    p.HtmlEncodeAndConvertTabsToSpaces = function (str, startOffset, length) {
+    };
+    p.HtmlEncodeAndConvertTabsToSpaces = function(str, startOffset, length) {
         var end = startOffset + length;
         var piece = startOffset;
         var pos = 0;
         var i;
         for (i = startOffset; i < end; i++) {
             switch (str.charAt(i)) {
-                case '\t':
+            case '\t':
 
-                    if (i > piece) {
-                        this.Append(str.substr(piece, i - piece));
-                    }
-                    piece = i + 1;
+                if (i > piece) {
+                    this.Append(str.substr(piece, i - piece));
+                }
+                piece = i + 1;
 
+                this.Append(' ');
+                pos++;
+                while ((pos % 4) != 0) {
                     this.Append(' ');
                     pos++;
-                    while ((pos % 4) != 0) {
-                        this.Append(' ');
-                        pos++;
-                    }
-                    pos--; 	// Compensate for the pos++ below
-                    break;
+                }
+                pos--; // Compensate for the pos++ below
+                break;
 
-                case '\r':
-                case '\n':
-                    if (i > piece)
-                        this.Append(str.substr(piece, i - piece));
-                    this.Append('\n');
-                    piece = i + 1;
-                    continue;
+            case '\r':
+            case '\n':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append('\n');
+                piece = i + 1;
+                continue;
 
-                case '&':
-                    if (i > piece)
-                        this.Append(str.substr(piece, i - piece));
-                    this.Append("&amp;");
-                    piece = i + 1;
-                    break;
+            case '&':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append("&amp;");
+                piece = i + 1;
+                break;
 
-                case '<':
-                    if (i > piece)
-                        this.Append(str.substr(piece, i - piece));
-                    this.Append("&lt;");
-                    piece = i + 1;
-                    break;
+            case '<':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append("&lt;");
+                piece = i + 1;
+                break;
 
-                case '>':
-                    if (i > piece)
-                        this.Append(str.substr(piece, i - piece));
-                    this.Append("&gt;");
-                    piece = i + 1;
-                    break;
+            case '>':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append("&gt;");
+                piece = i + 1;
+                break;
 
-                case '\"':
-                    if (i > piece)
-                        this.Append(str.substr(piece, i - piece));
-                    this.Append("&quot;");
-                    piece = i + 1;
-                    break;
+            case '\"':
+                if (i > piece)
+                    this.Append(str.substr(piece, i - piece));
+                this.Append("&quot;");
+                piece = i + 1;
+                break;
             }
 
             pos++;
@@ -870,12 +871,7 @@ var MarkdownDeep = new function () {
 
         if (i > piece)
             this.Append(str.substr(piece, i - piece));
-    }
-
-
-
-
-    /////////////////////////////////////////////////////////////////////////////
+    }; /////////////////////////////////////////////////////////////////////////////
     // StringScanner
 
     function StringScanner() {
@@ -883,88 +879,76 @@ var MarkdownDeep = new function () {
     }
 
     p = StringScanner.prototype;
-    p.bof = function () {
+    p.bof = function() {
         return this.m_position == this.start;
-    }
-
-    p.eof = function () {
+    };
+    p.eof = function() {
         return this.m_position >= this.end;
-    }
-
-    p.eol = function () {
+    };
+    p.eol = function() {
         if (this.m_position >= this.end)
             return true;
         var ch = this.buf.charAt(this.m_position);
         return ch == '\r' || ch == '\n' || ch == undefined || ch == '';
-    }
-
-    p.reset = function (/*string, position, length*/) {
+    };
+    p.reset = function( /*string, position, length*/) {
         this.buf = arguments.length > 0 ? arguments[0] : null;
         this.start = arguments.length > 1 ? arguments[1] : 0;
         this.end = arguments.length > 2 ? this.start + arguments[2] : (this.buf == null ? 0 : this.buf.length);
         this.m_position = this.start;
         this.charset_offsets = {};
-    }
-
-    p.current = function () {
+    };
+    p.current = function() {
         if (this.m_position >= this.end)
             return "\0";
         return this.buf.charAt(this.m_position);
-    }
-
-    p.remainder = function () {
+    };
+    p.remainder = function() {
         return this.buf.substr(this.m_position);
-    }
-
-    p.SkipToEof = function () {
+    };
+    p.SkipToEof = function() {
         this.m_position = this.end;
-    }
-
-    p.SkipForward = function (count) {
+    };
+    p.SkipForward = function(count) {
         this.m_position += count;
-    }
-
-    p.SkipToEol = function () {
+    };
+    p.SkipToEol = function() {
         this.m_position = this.buf.indexOf('\n', this.m_position);
         if (this.m_position < 0)
             this.m_position = this.end;
-    }
-
-    p.SkipEol = function () {
+    };
+    p.SkipEol = function() {
         var save = this.m_position;
         if (this.buf.charAt(this.m_position) == '\r')
             this.m_position++;
         if (this.buf.charAt(this.m_position) == '\n')
             this.m_position++;
         return this.m_position != save;
-    }
-
-    p.SkipToNextLine = function () {
+    };
+    p.SkipToNextLine = function() {
         this.SkipToEol();
         this.SkipEol();
-    }
-
-    p.CharAtOffset = function (offset) {
+    };
+    p.CharAtOffset = function(offset) {
         if (this.m_position + offset >= this.end)
             return "\0";
         return this.buf.charAt(this.m_position + offset);
-    }
-
-    p.SkipChar = function (ch) {
+    };
+    p.SkipChar = function(ch) {
         if (this.buf.charAt(this.m_position) == ch) {
             this.m_position++;
             return true;
         }
         return false;
-    }
-    p.SkipString = function (s) {
+    };
+    p.SkipString = function(s) {
         if (this.buf.substr(this.m_position, s.length) == s) {
             this.m_position += s.length;
             return true;
         }
         return false;
-    }
-    p.SkipWhitespace = function () {
+    };
+    p.SkipWhitespace = function() {
         var save = this.m_position;
         while (true) {
             var ch = this.buf.charAt(this.m_position);
@@ -973,8 +957,8 @@ var MarkdownDeep = new function () {
             this.m_position++;
         }
         return this.m_position != save;
-    }
-    p.SkipLinespace = function () {
+    };
+    p.SkipLinespace = function() {
         var save = this.m_position;
         while (true) {
             var ch = this.buf.charAt(this.m_position);
@@ -983,8 +967,8 @@ var MarkdownDeep = new function () {
             this.m_position++;
         }
         return this.m_position != save;
-    }
-    p.FindRE = function (re) {
+    };
+    p.FindRE = function(re) {
         re.lastIndex = this.m_position;
         var result = re.exec(this.buf);
         if (result == null) {
@@ -999,8 +983,8 @@ var MarkdownDeep = new function () {
 
         this.m_position = result.index;
         return true;
-    }
-    p.FindOneOf = function (charset) {
+    };
+    p.FindOneOf = function(charset) {
         var next = -1;
         for (var ch in charset) {
             var charset_info = charset[ch];
@@ -1035,25 +1019,25 @@ var MarkdownDeep = new function () {
 
         p.m_position = next;
         return true;
-    }
-    p.Find = function (s) {
+    };
+    p.Find = function(s) {
         this.m_position = this.buf.indexOf(s, this.m_position);
         if (this.m_position < 0) {
             this.m_position = this.end;
             return false;
         }
         return true;
-    }
-    p.Mark = function () {
+    };
+    p.Mark = function() {
         this.mark = this.m_position;
-    }
-    p.Extract = function () {
+    };
+    p.Extract = function() {
         if (this.mark >= this.m_position)
             return "";
         else
             return this.buf.substr(this.mark, this.m_position - this.mark);
-    }
-    p.SkipIdentifier = function () {
+    };
+    p.SkipIdentifier = function() {
         var ch = this.buf.charAt(this.m_position);
         if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_') {
             this.m_position++;
@@ -1066,9 +1050,8 @@ var MarkdownDeep = new function () {
             }
         }
         return false;
-    }
-
-    p.SkipFootnoteID = function () {
+    };
+    p.SkipFootnoteID = function() {
         var savepos = this.m_position;
 
         this.SkipLinespace();
@@ -1093,9 +1076,8 @@ var MarkdownDeep = new function () {
 
         this.m_position = savepos;
         return null;
-    }
-
-    p.SkipHtmlEntity = function () {
+    };
+    p.SkipHtmlEntity = function() {
         if (this.buf.charAt(this.m_position) != '&')
             return false;
 
@@ -1105,28 +1087,23 @@ var MarkdownDeep = new function () {
 
         this.m_position = newpos;
         return true;
-    }
-
-    p.SkipEscapableChar = function (ExtraMode) {
+    };
+    p.SkipEscapableChar = function(ExtraMode) {
         if (this.buf.charAt(this.m_position) == '\\' && is_escapable(this.buf.charAt(this.m_position + 1), ExtraMode)) {
             this.m_position += 2;
             return true;
-        }
-        else {
+        } else {
             if (this.m_position < this.end)
                 this.m_position++;
             return false;
         }
-    }
-
-
-    /////////////////////////////////////////////////////////////////////////////
+    }; /////////////////////////////////////////////////////////////////////////////
     // HtmlTag
 
-    var HtmlTagFlags_Block = 0x0001; 	// Block tag
-    var HtmlTagFlags_Inline = 0x0002; 	// Inline tag
-    var HtmlTagFlags_NoClosing = 0x0004; 	// No closing tag (eg: <hr> and <!-- -->)
-    var HtmlTagFlags_ContentAsSpan = 0x0008;        // When markdown=1 treat content as span, not block
+    var HtmlTagFlags_Block = 0x0001; // Block tag
+    var HtmlTagFlags_Inline = 0x0002; // Inline tag
+    var HtmlTagFlags_NoClosing = 0x0004; // No closing tag (eg: <hr> and <!-- -->)
+    var HtmlTagFlags_ContentAsSpan = 0x0008; // When markdown=1 treat content as span, not block
 
 
     function HtmlTag(name) {
@@ -1139,7 +1116,7 @@ var MarkdownDeep = new function () {
 
     p = HtmlTag.prototype;
 
-    p.attributeCount = function () {
+    p.attributeCount = function() {
         if (!this.attributes)
             return 0;
 
@@ -1148,9 +1125,8 @@ var MarkdownDeep = new function () {
             count++;
 
         return count;
-    }
-
-    p.get_Flags = function () {
+    };
+    p.get_Flags = function() {
         if (this.flags == 0) {
             this.flags = tag_flags[this.name.toLowerCase()];
             if (this.flags == undefined) {
@@ -1158,9 +1134,8 @@ var MarkdownDeep = new function () {
             }
         }
         return this.flags;
-    }
-
-    p.IsSafe = function () {
+    };
+    p.IsSafe = function() {
         var name_lower = this.name.toLowerCase();
 
         // Check if tag is in whitelist
@@ -1196,10 +1171,8 @@ var MarkdownDeep = new function () {
 
         // Passed all white list checks, allow it
         return true;
-    }
-
-    // Render opening tag (eg: <tag attr="value">
-    p.RenderOpening = function (dest) {
+    }; // Render opening tag (eg: <tag attr="value">
+    p.RenderOpening = function(dest) {
         dest.Append("<");
         dest.Append(this.name);
         for (var i in this.attributes) {
@@ -1214,22 +1187,18 @@ var MarkdownDeep = new function () {
             dest.Append(" />");
         else
             dest.Append(">");
-    }
-
-    // Render closing tag (eg: </tag>)
-    p.RenderClosing = function (dest) {
+    }; // Render closing tag (eg: </tag>)
+    p.RenderClosing = function(dest) {
         dest.Append("</");
         dest.Append(this.name);
         dest.Append(">");
-    }
-
-
+    };
 
     function IsSafeUrl(url) {
         url = url.toLowerCase();
         return (url.substr(0, 7) == "http://" ||
-                url.substr(0, 8) == "https://" ||
-                url.substr(0, 6) == "ftp://");
+            url.substr(0, 8) == "https://" ||
+            url.substr(0, 6) == "ftp://");
     }
 
     function ParseHtmlTag(p) {
@@ -1331,8 +1300,7 @@ var MarkdownDeep = new function () {
 
                     // Skip closing quote
                     p.SkipForward(1);
-                }
-                else {
+                } else {
                     // Scan the value
                     p.Mark();
                     while (!p.eof() && !is_whitespace(p.current()) && p.current() != '>' && p.current() != '/')
@@ -1343,8 +1311,7 @@ var MarkdownDeep = new function () {
                         tag.attributes[attributeName] = p.Extract();
                     }
                 }
-            }
-            else {
+            } else {
                 tag.attributes[attributeName] = "";
             }
         }
@@ -1354,9 +1321,34 @@ var MarkdownDeep = new function () {
 
 
     var allowed_tags = {
-        "b": 1, "blockquote": 1, "code": 1, "dd": 1, "dt": 1, "dl": 1, "del": 1, "em": 1,
-        "h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1, "i": 1, "kbd": 1, "li": 1, "ol": 1, "ul": 1,
-        "p": 1, "pre": 1, "s": 1, "sub": 1, "sup": 1, "strong": 1, "strike": 1, "img": 1, "a": 1
+        "b": 1,
+        "blockquote": 1,
+        "code": 1,
+        "dd": 1,
+        "dt": 1,
+        "dl": 1,
+        "del": 1,
+        "em": 1,
+        "h1": 1,
+        "h2": 1,
+        "h3": 1,
+        "h4": 1,
+        "h5": 1,
+        "h6": 1,
+        "i": 1,
+        "kbd": 1,
+        "li": 1,
+        "ol": 1,
+        "ul": 1,
+        "p": 1,
+        "pre": 1,
+        "s": 1,
+        "sub": 1,
+        "sup": 1,
+        "strong": 1,
+        "strike": 1,
+        "img": 1,
+        "a": 1
     };
 
     var allowed_attributes = {
@@ -1408,8 +1400,7 @@ var MarkdownDeep = new function () {
     delete n;
 
 
-
-    /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
     // LinkDefinition
 
     function LinkDefinition(id, url, title) {
@@ -1422,7 +1413,7 @@ var MarkdownDeep = new function () {
     }
 
     p = LinkDefinition.prototype;
-    p.RenderLink = function (m, b, link_text) {
+    p.RenderLink = function(m, b, link_text) {
         if (this.url.substr(0, 7).toLowerCase() == "mailto:") {
             b.Append("<a href=\"");
             b.HtmlRandomize(this.url);
@@ -1435,8 +1426,7 @@ var MarkdownDeep = new function () {
             b.Append('>');
             b.HtmlRandomize(link_text);
             b.Append("</a>");
-        }
-        else {
+        } else {
             var tag = new HtmlTag("a");
 
             // encode url
@@ -1457,12 +1447,11 @@ var MarkdownDeep = new function () {
             // Render the opening tag
             tag.RenderOpening(b);
 
-            b.Append(link_text);   // Link text already escaped by SpanFormatter
+            b.Append(link_text); // Link text already escaped by SpanFormatter
             b.Append("</a>");
         }
-    }
-
-    p.RenderImg = function (m, b, alt_text) {
+    };
+    p.RenderImg = function(m, b, alt_text) {
         var tag = new HtmlTag("img");
 
         // encode url
@@ -1508,7 +1497,7 @@ var MarkdownDeep = new function () {
         }
         b.Append(" />");
         */
-    }
+    };
 
     function ParseLinkDefinition(p, ExtraMode) {
         var savepos = p.m_position;
@@ -1584,8 +1573,7 @@ var MarkdownDeep = new function () {
 
             // Skip whitespace
             p.SkipWhitespace();
-        }
-        else {
+        } else {
             // Find end of the url
             p.Mark();
             var paren_depth = 1;
@@ -1625,22 +1613,21 @@ var MarkdownDeep = new function () {
         // Work out what the title is delimited with
         var delim;
         switch (p.current()) {
-            case '\'':
-            case '\"':
-                delim = p.current();
-                break;
+        case '\'':
+        case '\"':
+            delim = p.current();
+            break;
 
-            case '(':
-                delim = ')';
-                break;
+        case '(':
+            delim = ')';
+            break;
 
-            default:
-                if (bOnNewLine) {
-                    p.m_position = posLineEnd;
-                    return r;
-                }
-                else
-                    return null;
+        default:
+            if (bOnNewLine) {
+                p.m_position = posLineEnd;
+                return r;
+            } else
+                return null;
         }
 
         // Skip the opening title delimiter
@@ -1666,7 +1653,7 @@ var MarkdownDeep = new function () {
                     // Next we expect either the end of the line for a link definition
                     // or the close bracket for an inline link
                     if ((id == null && p.current() != ')') ||
-					    (id != null && !p.eol())) {
+                    (id != null && !p.eol())) {
                         continue;
                     }
 
@@ -1740,7 +1727,7 @@ var MarkdownDeep = new function () {
 
     p = SpanFormatter.prototype;
 
-    p.FormatParagraph = function (dest, str, start, len) {
+    p.FormatParagraph = function(dest, str, start, len) {
         // Parse the string into a list of tokens
         this.Tokenize(str, start, len);
 
@@ -1768,39 +1755,31 @@ var MarkdownDeep = new function () {
             }
 
             dest.Append("</div>\n");
-        }
-        else {
+        } else {
             // Render the paragraph
             dest.Append("<p>");
             this.Render(dest, str);
             dest.Append("</p>\n");
         }
 
-    }
-
-    // Format part of a string into a destination string builder
-    p.Format2 = function (dest, str) {
+    }; // Format part of a string into a destination string builder
+    p.Format2 = function(dest, str) {
         this.Format(dest, str, 0, str.length);
-    }
-
-    // Format part of a string into a destination string builder
-    p.Format = function (dest, str, start, len) {
+    }; // Format part of a string into a destination string builder
+    p.Format = function(dest, str, start, len) {
         // Parse the string into a list of tokens
         this.Tokenize(str, start, len);
 
         // Render all tokens
         this.Render(dest, str);
-    }
-
-    // Format a string and return it as a new string
+    }; // Format a string and return it as a new string
     // (used in formatting the text of links)
-    p.FormatDirect = function (str) {
+    p.FormatDirect = function(str) {
         var dest = new StringBuilder();
         this.Format(dest, str, 0, str.length);
         return dest.ToString();
-    }
-
-    p.MakeID = function (str, start, len) {
+    };
+    p.MakeID = function(str, start, len) {
         // Parse the string into a list of tokens
         this.Tokenize(str, start, len);
         var tokens = this.m_Tokens;
@@ -1809,13 +1788,13 @@ var MarkdownDeep = new function () {
         for (var i = 0; i < tokens.length; i++) {
             var t = tokens[i];
             switch (t.type) {
-                case TokenType_Text:
-                    sb.Append(str.substr(t.startOffset, t.length));
-                    break;
+            case TokenType_Text:
+                sb.Append(str.substr(t.startOffset, t.length));
+                break;
 
-                case TokenType_link:
-                    sb.Append(t.data.link_text);
-                    break;
+            case TokenType_link:
+                sb.Append(t.data.link_text);
+                break;
             }
             this.FreeToken(t);
         }
@@ -1849,106 +1828,101 @@ var MarkdownDeep = new function () {
         }
 
         return sb.ToString();
-    }
-
-
-
-    // Render a list of tokens to a destination string builder.
-    p.Render = function (sb, str) {
+    }; // Render a list of tokens to a destination string builder.
+    p.Render = function(sb, str) {
         var tokens = this.m_Tokens;
         var len = tokens.length;
         for (var i = 0; i < len; i++) {
             var t = tokens[i];
             switch (t.type) {
-                case TokenType_Text:
-                    // Append encoded text
-                    sb.HtmlEncode(str, t.startOffset, t.length);
-                    break;
+            case TokenType_Text:
+                // Append encoded text
+                sb.HtmlEncode(str, t.startOffset, t.length);
+                break;
 
-                case TokenType_HtmlTag:
-                    // Append html as is
-                    sb.SmartHtmlEncodeAmps(str, t.startOffset, t.length);
-                    break;
+            case TokenType_HtmlTag:
+                // Append html as is
+                sb.SmartHtmlEncodeAmps(str, t.startOffset, t.length);
+                break;
 
-                case TokenType_Html:
-                case TokenType_opening_mark:
-                case TokenType_closing_mark:
-                case TokenType_internal_mark:
-                    // Append html as is
-                    sb.Append(str.substr(t.startOffset, t.length));
-                    break;
+            case TokenType_Html:
+            case TokenType_opening_mark:
+            case TokenType_closing_mark:
+            case TokenType_internal_mark:
+                // Append html as is
+                sb.Append(str.substr(t.startOffset, t.length));
+                break;
 
-                case TokenType_br:
-                    sb.Append("<br />\n");
-                    break;
+            case TokenType_br:
+                sb.Append("<br />\n");
+                break;
 
-                case TokenType_open_em:
-                    sb.Append("<em>");
-                    break;
+            case TokenType_open_em:
+                sb.Append("<em>");
+                break;
 
-                case TokenType_close_em:
-                    sb.Append("</em>");
-                    break;
+            case TokenType_close_em:
+                sb.Append("</em>");
+                break;
 
-                case TokenType_open_strong:
-                    sb.Append("<strong>");
-                    break;
+            case TokenType_open_strong:
+                sb.Append("<strong>");
+                break;
 
-                case TokenType_close_strong:
-                    sb.Append("</strong>");
-                    break;
+            case TokenType_close_strong:
+                sb.Append("</strong>");
+                break;
 
-                case TokenType_code_span:
-                    sb.Append("<code>");
-                    sb.HtmlEncode(str, t.startOffset, t.length);
-                    sb.Append("</code>");
-                    break;
+            case TokenType_code_span:
+                sb.Append("<code>");
+                sb.HtmlEncode(str, t.startOffset, t.length);
+                sb.Append("</code>");
+                break;
 
-                case TokenType_link:
-                    var li = t.data;
-                    var sf = new SpanFormatter(this.m_Markdown);
-                    sf.m_DisableLinks = true;
+            case TokenType_link:
+                var li = t.data;
+                var sf = new SpanFormatter(this.m_Markdown);
+                sf.m_DisableLinks = true;
 
-                    li.def.RenderLink(this.m_Markdown, sb, sf.FormatDirect(li.link_text));
-                    break;
+                li.def.RenderLink(this.m_Markdown, sb, sf.FormatDirect(li.link_text));
+                break;
 
-                case TokenType_img:
-                    var li = t.data;
-                    li.def.RenderImg(this.m_Markdown, sb, li.link_text);
-                    break;
+            case TokenType_img:
+                var li = t.data;
+                li.def.RenderImg(this.m_Markdown, sb, li.link_text);
+                break;
 
-                case TokenType_footnote:
-                    var r = t.data;
-                    sb.Append("<sup id=\"fnref:");
-                    sb.Append(r.id);
-                    sb.Append("\"><a href=\"#fn:");
-                    sb.Append(r.id);
-                    sb.Append("\" rel=\"footnote\">");
-                    sb.Append(r.index + 1);
-                    sb.Append("</a></sup>");
-                    break;
+            case TokenType_footnote:
+                var r = t.data;
+                sb.Append("<sup id=\"fnref:");
+                sb.Append(r.id);
+                sb.Append("\"><a href=\"#fn:");
+                sb.Append(r.id);
+                sb.Append("\" rel=\"footnote\">");
+                sb.Append(r.index + 1);
+                sb.Append("</a></sup>");
+                break;
 
-                case TokenType_abbreviation:
-                    var a = t.data;
-                    sb.Append("<abbr");
-                    if (a.Title) {
-                        sb.Append(" title=\"");
-                        sb.HtmlEncode(a.Title, 0, a.Title.length);
-                        sb.Append("\"");
-                    }
-                    sb.Append(">");
-                    sb.HtmlEncode(a.Abbr, 0, a.Abbr.length);
-                    sb.Append("</abbr>");
-                    break;
+            case TokenType_abbreviation:
+                var a = t.data;
+                sb.Append("<abbr");
+                if (a.Title) {
+                    sb.Append(" title=\"");
+                    sb.HtmlEncode(a.Title, 0, a.Title.length);
+                    sb.Append("\"");
+                }
+                sb.Append(">");
+                sb.HtmlEncode(a.Abbr, 0, a.Abbr.length);
+                sb.Append("</abbr>");
+                break;
 
 
             }
 
             this.FreeToken(t);
         }
-    }
-
-    p.Tokenize = function (str, start, len) {
+    };
+    p.Tokenize = function(str, start, len) {
         // Reset the string scanner
         var p = this.m_Scanner;
         p.reset(str, start, len);
@@ -1974,99 +1948,97 @@ var MarkdownDeep = new function () {
             // Work out token
             var token = null;
             switch (p.current()) {
-                case '*':
-                case '_':
+            case '*':
+            case '_':
 
-                    // Create emphasis mark
-                    token = this.CreateEmphasisMark();
+                // Create emphasis mark
+                token = this.CreateEmphasisMark();
 
-                    if (token != null) {
-                        // Store marks in a separate list the we'll resolve later
-                        switch (token.type) {
-                            case TokenType_internal_mark:
-                            case TokenType_opening_mark:
-                            case TokenType_closing_mark:
-                                if (emphasis_marks == null) {
-                                    emphasis_marks = [];
-                                }
-                                emphasis_marks.push(token);
-                                break;
+                if (token != null) {
+                    // Store marks in a separate list the we'll resolve later
+                    switch (token.type) {
+                    case TokenType_internal_mark:
+                    case TokenType_opening_mark:
+                    case TokenType_closing_mark:
+                        if (emphasis_marks == null) {
+                            emphasis_marks = [];
                         }
+                        emphasis_marks.push(token);
+                        break;
                     }
-                    break;
+                }
+                break;
 
-                case '`':
-                    token = this.ProcessCodeSpan();
-                    break;
+            case '`':
+                token = this.ProcessCodeSpan();
+                break;
 
-                case '[':
-                case '!':
-                    // Process link reference
-                    var linkpos = p.m_position;
-                    token = this.ProcessLinkOrImageOrFootnote();
+            case '[':
+            case '!':
+                // Process link reference
+                var linkpos = p.m_position;
+                token = this.ProcessLinkOrImageOrFootnote();
 
-                    // Rewind if invalid syntax
-                    // (the '[' or '!' will be treated as a regular character and processed below)
-                    if (token == null)
-                        p.m_position = linkpos;
-                    break;
+                // Rewind if invalid syntax
+                // (the '[' or '!' will be treated as a regular character and processed below)
+                if (token == null)
+                    p.m_position = linkpos;
+                break;
 
-                case '<':
-                    // Is it a valid html tag?
-                    var save = p.m_position;
-                    var tag = ParseHtmlTag(p);
-                    if (tag != null) {
+            case '<':
+                // Is it a valid html tag?
+                var save = p.m_position;
+                var tag = ParseHtmlTag(p);
+                if (tag != null) {
+                    // Yes, create a token for it
+                    if (!this.m_Markdown.SafeMode || tag.IsSafe()) {
                         // Yes, create a token for it
-                        if (!this.m_Markdown.SafeMode || tag.IsSafe()) {
-                            // Yes, create a token for it
-                            token = this.CreateToken(TokenType_HtmlTag, save, p.m_position - save);
-                        }
-                        else {
-                            // No, rewrite and encode it
-                            p.m_position = save;
-                        }
-                    }
-                    else {
-                        // No, rewind and check if it's a valid autolink eg: <google.com>
+                        token = this.CreateToken(TokenType_HtmlTag, save, p.m_position - save);
+                    } else {
+                        // No, rewrite and encode it
                         p.m_position = save;
-                        token = this.ProcessAutoLink();
-
-                        if (token == null)
-                            p.m_position = save;
                     }
-                    break;
+                } else {
+                    // No, rewind and check if it's a valid autolink eg: <google.com>
+                    p.m_position = save;
+                    token = this.ProcessAutoLink();
 
-                case '&':
-                    // Is it a valid html entity
-                    var save = p.m_position;
-                    if (p.SkipHtmlEntity()) {
-                        // Yes, create a token for it
-                        token = this.CreateToken(TokenType_Html, save, p.m_position - save);
+                    if (token == null)
+                        p.m_position = save;
+                }
+                break;
+
+            case '&':
+                // Is it a valid html entity
+                var save = p.m_position;
+                if (p.SkipHtmlEntity()) {
+                    // Yes, create a token for it
+                    token = this.CreateToken(TokenType_Html, save, p.m_position - save);
+                }
+
+                break;
+
+            case ' ':
+                // Check for double space at end of a line
+                if (p.CharAtOffset(1) == ' ' && is_lineend(p.CharAtOffset(2))) {
+                    // Yes, skip it
+                    p.SkipForward(2);
+
+                    // Don't put br's at the end of a paragraph
+                    if (!p.eof()) {
+                        p.SkipEol();
+                        token = this.CreateToken(TokenType_br, end_text_token, 0);
                     }
+                }
+                break;
 
-                    break;
-
-                case ' ':
-                    // Check for double space at end of a line
-                    if (p.CharAtOffset(1) == ' ' && is_lineend(p.CharAtOffset(2))) {
-                        // Yes, skip it
-                        p.SkipForward(2);
-
-                        // Don't put br's at the end of a paragraph
-                        if (!p.eof()) {
-                            p.SkipEol();
-                            token = this.CreateToken(TokenType_br, end_text_token, 0);
-                        }
-                    }
-                    break;
-
-                case '\\':
-                    // Check followed by an escapable character
-                    if (is_escapable(p.CharAtOffset(1), ExtraMode)) {
-                        token = this.CreateToken(TokenType_Text, p.m_position + 1, 1);
-                        p.SkipForward(2);
-                    }
-                    break;
+            case '\\':
+                // Check followed by an escapable character
+                if (is_escapable(p.CharAtOffset(1), ExtraMode)) {
+                    token = this.CreateToken(TokenType_Text, p.m_position + 1, 1);
+                    p.SkipForward(2);
+                }
+                break;
             }
 
             // Look for abbreviations.
@@ -2096,8 +2068,7 @@ var MarkdownDeep = new function () {
 
                 // Remember where the next text token starts
                 start_text_token = p.m_position;
-            }
-            else {
+            } else {
                 // Skip a single character and keep looking
                 p.SkipForward(1);
             }
@@ -2112,9 +2083,7 @@ var MarkdownDeep = new function () {
         if (emphasis_marks != null) {
             this.ResolveEmphasisMarks(tokens, emphasis_marks);
         }
-    }
-
-    /*
+    }; /*
     * Resolving emphasis tokens is a two part process
     * 
     * 1. Find all valid sequences of * and _ and create `mark` tokens for them
@@ -2128,7 +2097,7 @@ var MarkdownDeep = new function () {
     */
 
     // Create emphasis mark for sequences of '*' and '_' (part 1)
-    p.CreateEmphasisMark = function () {
+    p.CreateEmphasisMark = function() {
         var p = this.m_Scanner;
 
         // Capture current state
@@ -2180,10 +2149,8 @@ var MarkdownDeep = new function () {
 
 
         return this.CreateToken(TokenType_internal_mark, savepos, p.m_position - savepos);
-    }
-
-    // Split mark token
-    p.SplitMarkToken = function (tokens, marks, token, position) {
+    }; // Split mark token
+    p.SplitMarkToken = function(tokens, marks, token, position) {
         // Create the new rhs token
         var tokenRhs = this.CreateToken(token.type, token.startOffset + position, token.length - position);
 
@@ -2196,10 +2163,8 @@ var MarkdownDeep = new function () {
 
         // Return the new token
         return tokenRhs;
-    }
-
-    // Resolve emphasis marks (part 2)
-    p.ResolveEmphasisMarks = function (tokens, marks) {
+    }; // Resolve emphasis marks (part 2)
+    p.ResolveEmphasisMarks = function(tokens, marks) {
         var input = this.m_Scanner.buf;
 
         var bContinue = true;
@@ -2254,10 +2219,8 @@ var MarkdownDeep = new function () {
                 }
             }
         }
-    }
-
-    // Process auto links eg: <google.com>
-    p.ProcessAutoLink = function () {
+    }; // Process auto links eg: <google.com>
+    p.ProcessAutoLink = function() {
         if (this.m_DisableLinks)
             return null;
 
@@ -2286,15 +2249,13 @@ var MarkdownDeep = new function () {
                     var link_text;
                     if (url.toLowerCase().substr(0, 7) == "mailto:") {
                         link_text = url.substr(7);
-                    }
-                    else {
+                    } else {
                         link_text = url;
                         url = "mailto:" + url;
                     }
 
                     li = new LinkInfo(new LinkDefinition("auto", url, null), link_text);
-                }
-                else if (IsWebAddress(url)) {
+                } else if (IsWebAddress(url)) {
                     li = new LinkInfo(new LinkDefinition("auto", url, null), url);
                 }
 
@@ -2311,10 +2272,8 @@ var MarkdownDeep = new function () {
 
         // Didn't work
         return null;
-    }
-
-    // Process [link] and ![image] directives
-    p.ProcessLinkOrImageOrFootnote = function () {
+    }; // Process [link] and ![image] directives
+    p.ProcessLinkOrImageOrFootnote = function() {
         var p = this.m_Scanner;
 
         // Link or image?
@@ -2358,8 +2317,7 @@ var MarkdownDeep = new function () {
             var ch = p.current();
             if (ch == '[') {
                 depth++;
-            }
-            else if (ch == ']') {
+            } else if (ch == ']') {
                 depth--;
                 if (depth == 0)
                     break;
@@ -2424,8 +2382,7 @@ var MarkdownDeep = new function () {
 
             // Skip closing ']'
             p.SkipForward(1);
-        }
-        else {
+        } else {
             // Rewind to just after the closing ']'
             p.m_position = savepos;
         }
@@ -2460,10 +2417,8 @@ var MarkdownDeep = new function () {
 
         // Create a token
         return this.CreateDataToken(token_type, new LinkInfo(def, link_text));
-    }
-
-    // Process a ``` code span ```
-    p.ProcessCodeSpan = function () {
+    }; // Process a ``` code span ```
+    p.ProcessCodeSpan = function() {
         var p = this.m_Scanner;
         var start = p.m_position;
 
@@ -2495,9 +2450,8 @@ var MarkdownDeep = new function () {
         var ret = this.CreateToken(TokenType_code_span, startofcode, p.m_position - startofcode);
         p.m_position = endpos;
         return ret;
-    }
-
-    p.CreateToken = function (type, startOffset, length) {
+    };
+    p.CreateToken = function(type, startOffset, length) {
         if (this.m_SpareTokens.length != 0) {
             var t = this.m_SpareTokens.pop();
             t.type = type;
@@ -2505,35 +2459,25 @@ var MarkdownDeep = new function () {
             t.length = length;
             t.data = null;
             return t;
-        }
-        else
+        } else
             return new Token(type, startOffset, length);
-    }
-
-    // CreateToken - create or re-use a token object
-    p.CreateDataToken = function (type, data) {
+    }; // CreateToken - create or re-use a token object
+    p.CreateDataToken = function(type, data) {
         if (this.m_SpareTokens.length != 0) {
             var t = this.m_SpareTokens.pop();
             t.type = type;
             t.data = data;
             return t;
-        }
-        else {
+        } else {
             var t = new Token(type, 0, 0);
             t.data = data;
             return t;
         }
-    }
-
-    // FreeToken - return a token to the spare token pool
-    p.FreeToken = function (token) {
+    }; // FreeToken - return a token to the spare token pool
+    p.FreeToken = function(token) {
         token.data = null;
         this.m_SpareTokens.push(token);
-    }
-
-
-
-    /////////////////////////////////////////////////////////////////////////////
+    }; /////////////////////////////////////////////////////////////////////////////
     // Block
 
     var BlockType_Blank = 0;
@@ -2551,21 +2495,22 @@ var MarkdownDeep = new function () {
     var BlockType_p = 12;
     var BlockType_indent = 13;
     var BlockType_hr = 14;
-    var BlockType_html = 15;
-    var BlockType_unsafe_html = 16;
-    var BlockType_span = 17;
-    var BlockType_codeblock = 18;
-    var BlockType_li = 19;
-    var BlockType_ol = 20;
-    var BlockType_ul = 21;
-    var BlockType_HtmlTag = 22;
-    var BlockType_Composite = 23;
-    var BlockType_table_spec = 24;
-    var BlockType_dd = 25;
-    var BlockType_dt = 26;
-    var BlockType_dl = 27;
-    var BlockType_footnote = 28;
-    var BlockType_p_footnote = 29;
+    var BlockType_user_break = 15;
+    var BlockType_html = 16;
+    var BlockType_unsafe_html = 17;
+    var BlockType_span = 18;
+    var BlockType_codeblock = 19;
+    var BlockType_li = 20;
+    var BlockType_ol = 21;
+    var BlockType_ul = 22;
+    var BlockType_HtmlTag = 23;
+    var BlockType_Composite = 24;
+    var BlockType_table_spec = 25;
+    var BlockType_dd = 26;
+    var BlockType_dt = 27;
+    var BlockType_dl = 28;
+    var BlockType_footnote = 29;
+    var BlockType_p_footnote = 30;
 
 
     function Block() {
@@ -2582,33 +2527,28 @@ var MarkdownDeep = new function () {
     p.children = null;
     p.data = null;
 
-    p.get_Content = function () {
+    p.get_Content = function() {
         if (this.buf == null)
             return null;
         if (this.contentStart == -1)
             return this.buf;
 
         return this.buf.substr(this.contentStart, this.contentLen);
-    }
-
-
-    p.get_CodeContent = function () {
+    };
+    p.get_CodeContent = function() {
         var s = new StringBuilder();
         for (var i = 0; i < this.children.length; i++) {
             s.Append(this.children[i].get_Content());
             s.Append('\n');
         }
         return s.ToString();
-    }
-
-
-    p.RenderChildren = function (m, b) {
+    };
+    p.RenderChildren = function(m, b) {
         for (var i = 0; i < this.children.length; i++) {
             this.children[i].Render(m, b);
         }
-    }
-
-    p.ResolveHeaderID = function (m) {
+    };
+    p.ResolveHeaderID = function(m) {
         // Already resolved?
         if (typeof (this.data) == 'string')
             return this.data;
@@ -2619,230 +2559,219 @@ var MarkdownDeep = new function () {
         if (res != null) {
             this.set_contentEnd(res.end);
             id = res.id;
-        }
-        else {
+        } else {
             // Approach 2 - pandoc style header id
             id = m.MakeUniqueHeaderID(this.buf, this.contentStart, this.contentLen);
         }
 
         this.data = id;
         return id;
-    }
-
-    p.Render = function (m, b) {
+    };
+    p.Render = function(m, b) {
         switch (this.blockType) {
-            case BlockType_Blank:
-                return;
+        case BlockType_Blank:
+            return;
 
-            case BlockType_p:
-                m.m_SpanFormatter.FormatParagraph(b, this.buf, this.contentStart, this.contentLen);
-                break;
+        case BlockType_p:
+            m.m_SpanFormatter.FormatParagraph(b, this.buf, this.contentStart, this.contentLen);
+            break;
 
-            case BlockType_span:
-                m.m_SpanFormatter.Format(b, this.buf, this.contentStart, this.contentLen);
+        case BlockType_span:
+            m.m_SpanFormatter.Format(b, this.buf, this.contentStart, this.contentLen);
+            b.Append("\n");
+            break;
+
+        case BlockType_h1:
+        case BlockType_h2:
+        case BlockType_h3:
+        case BlockType_h4:
+        case BlockType_h5:
+        case BlockType_h6:
+            if (m.ExtraMode && !m.SafeMode) {
+                b.Append("<h" + (this.blockType - BlockType_h1 + 1).toString());
+                var id = this.ResolveHeaderID(m);
+                if (id) {
+                    b.Append(" id=\"");
+                    b.Append(id);
+                    b.Append("\">");
+                } else {
+                    b.Append(">");
+                }
+            } else {
+                b.Append("<h" + (this.blockType - BlockType_h1 + 1).toString() + ">");
+            }
+            m.m_SpanFormatter.Format(b, this.buf, this.contentStart, this.contentLen);
+            b.Append("</h" + (this.blockType - BlockType_h1 + 1).toString() + ">\n");
+            break;
+
+        case BlockType_hr:
+            b.Append("<hr />\n");
+            return;
+
+        case BlockType_user_break:
+            return;
+
+        case BlockType_ol_li:
+        case BlockType_ul_li:
+            b.Append("<li>");
+            m.m_SpanFormatter.Format(b, this.buf, this.contentStart, this.contentLen);
+            b.Append("</li>\n");
+            break;
+
+        case BlockType_html:
+            b.Append(this.buf.substr(this.contentStart, this.contentLen));
+            return;
+
+        case BlockType_unsafe_html:
+            b.HtmlEncode(this.buf, this.contentStart, this.contentLen);
+            return;
+
+        case BlockType_codeblock:
+            b.Append("<pre");
+            if (m.FormatCodeBlockAttributes != null) {
+                b.Append(m.FormatCodeBlockAttributes(this.data));
+            }
+            b.Append("><code>");
+
+            var btemp = b;
+            if (m.FormatCodeBlock) {
+                btemp = b;
+                b = new StringBuilder();
+            }
+
+            for (var i = 0; i < this.children.length; i++) {
+                var line = this.children[i];
+                b.HtmlEncodeAndConvertTabsToSpaces(line.buf, line.contentStart, line.contentLen);
                 b.Append("\n");
-                break;
+            }
 
-            case BlockType_h1:
-            case BlockType_h2:
-            case BlockType_h3:
-            case BlockType_h4:
-            case BlockType_h5:
-            case BlockType_h6:
-                if (m.ExtraMode && !m.SafeMode) {
-                    b.Append("<h" + (this.blockType - BlockType_h1 + 1).toString());
-                    var id = this.ResolveHeaderID(m);
-                    if (id) {
-                        b.Append(" id=\"");
-                        b.Append(id);
-                        b.Append("\">");
-                    }
-                    else {
-                        b.Append(">");
-                    }
-                }
-                else {
-                    b.Append("<h" + (this.blockType - BlockType_h1 + 1).toString() + ">");
-                }
-                m.m_SpanFormatter.Format(b, this.buf, this.contentStart, this.contentLen);
-                b.Append("</h" + (this.blockType - BlockType_h1 + 1).toString() + ">\n");
-                break;
+            if (m.FormatCodeBlock) {
+                btemp.Append(m.FormatCodeBlock(b.ToString(), this.data));
+                b = btemp;
+            }
+            b.Append("</code></pre>\n\n");
+            return;
 
-            case BlockType_hr:
-                b.Append("<hr />\n");
-                return;
+        case BlockType_quote:
+            b.Append("<blockquote>\n");
+            this.RenderChildren(m, b);
+            b.Append("</blockquote>\n");
+            return;
 
-            case BlockType_ol_li:
-            case BlockType_ul_li:
-                b.Append("<li>");
-                m.m_SpanFormatter.Format(b, this.buf, this.contentStart, this.contentLen);
-                b.Append("</li>\n");
-                break;
+        case BlockType_li:
+            b.Append("<li>\n");
+            this.RenderChildren(m, b);
+            b.Append("</li>\n");
+            return;
 
-            case BlockType_html:
-                b.Append(this.buf.substr(this.contentStart, this.contentLen));
-                return;
+        case BlockType_ol:
+            b.Append("<ol>\n");
+            this.RenderChildren(m, b);
+            b.Append("</ol>\n");
+            return;
 
-            case BlockType_unsafe_html:
-                b.HtmlEncode(this.buf, this.contentStart, this.contentLen);
-                return;
+        case BlockType_ul:
+            b.Append("<ul>\n");
+            this.RenderChildren(m, b);
+            b.Append("</ul>\n");
+            return;
 
-            case BlockType_codeblock:
-                b.Append("<pre");
-                if (m.FormatCodeBlockAttributes != null) {
-                    b.Append(m.FormatCodeBlockAttributes(this.data));
-                }
-                b.Append("><code>");
+        case BlockType_HtmlTag:
+            var tag = this.data;
 
-                var btemp = b;
-                if (m.FormatCodeBlock) {
-                    btemp = b;
-                    b = new StringBuilder();
-                }
+            // Prepare special tags
+            var name = tag.name.toLowerCase();
+            if (name == "a") {
+                m.OnPrepareLink(tag);
+            } else if (name == "img") {
+                m.OnPrepareImage(tag, m.RenderingTitledImage);
+            }
 
-                for (var i = 0; i < this.children.length; i++) {
-                    var line = this.children[i];
-                    b.HtmlEncodeAndConvertTabsToSpaces(line.buf, line.contentStart, line.contentLen);
-                    b.Append("\n");
-                }
+            tag.RenderOpening(b);
+            b.Append("\n");
+            this.RenderChildren(m, b);
+            tag.RenderClosing(b);
+            b.Append("\n");
+            return;
 
-                if (m.FormatCodeBlock) {
-                    btemp.Append(m.FormatCodeBlock(b.ToString(), this.data));
-                    b = btemp;
-                }
-                b.Append("</code></pre>\n\n");
-                return;
+        case BlockType_Composite:
+        case BlockType_footnote:
+            this.RenderChildren(m, b);
+            return;
 
-            case BlockType_quote:
-                b.Append("<blockquote>\n");
-                this.RenderChildren(m, b);
-                b.Append("</blockquote>\n");
-                return;
+        case BlockType_table_spec:
+            this.data.Render(m, b);
+            return;
 
-            case BlockType_li:
-                b.Append("<li>\n");
-                this.RenderChildren(m, b);
-                b.Append("</li>\n");
-                return;
-
-            case BlockType_ol:
-                b.Append("<ol>\n");
-                this.RenderChildren(m, b);
-                b.Append("</ol>\n");
-                return;
-
-            case BlockType_ul:
-                b.Append("<ul>\n");
-                this.RenderChildren(m, b);
-                b.Append("</ul>\n");
-                return;
-
-            case BlockType_HtmlTag:
-                var tag = this.data;
-
-                // Prepare special tags
-                var name = tag.name.toLowerCase();
-                if (name == "a") {
-                    m.OnPrepareLink(tag);
-                }
-                else if (name == "img") {
-                    m.OnPrepareImage(tag, m.RenderingTitledImage);
-                }
-
-                tag.RenderOpening(b);
+        case BlockType_dd:
+            b.Append("<dd>");
+            if (this.children != null) {
                 b.Append("\n");
                 this.RenderChildren(m, b);
-                tag.RenderClosing(b);
-                b.Append("\n");
-                return;
+            } else
+                m.m_SpanFormatter.Format(b, this.buf, this.contentStart, this.contentLen);
+            b.Append("</dd>\n");
+            break;
 
-            case BlockType_Composite:
-            case BlockType_footnote:
-                this.RenderChildren(m, b);
-                return;
-
-            case BlockType_table_spec:
-                this.data.Render(m, b);
-                return;
-
-            case BlockType_dd:
-                b.Append("<dd>");
-                if (this.children != null) {
-                    b.Append("\n");
-                    this.RenderChildren(m, b);
-                }
-                else
-                    m.m_SpanFormatter.Format(b, this.buf, this.contentStart, this.contentLen);
-                b.Append("</dd>\n");
-                break;
-
-            case BlockType_dt:
-                if (this.children == null) {
-                    var lines = this.get_Content().split("\n");
-                    for (var i = 0; i < lines.length; i++) {
-                        var l = lines[i];
-                        b.Append("<dt>");
-                        m.m_SpanFormatter.Format2(b, Trim(l));
-                        b.Append("</dt>\n");
-                    }
-                }
-                else {
-                    b.Append("<dt>\n");
-                    this.RenderChildren(m, b);
+        case BlockType_dt:
+            if (this.children == null) {
+                var lines = this.get_Content().split("\n");
+                for (var i = 0; i < lines.length; i++) {
+                    var l = lines[i];
+                    b.Append("<dt>");
+                    m.m_SpanFormatter.Format2(b, Trim(l));
                     b.Append("</dt>\n");
                 }
-                break;
-
-            case BlockType_dl:
-                b.Append("<dl>\n");
+            } else {
+                b.Append("<dt>\n");
                 this.RenderChildren(m, b);
-                b.Append("</dl>\n");
-                return;
+                b.Append("</dt>\n");
+            }
+            break;
 
-            case BlockType_p_footnote:
-                b.Append("<p>");
-                if (this.contentLen > 0) {
-                    m.m_SpanFormatter.Format(b, this.buf, this.contentStart, this.contentLen);
-                    b.Append("&nbsp;");
-                }
-                b.Append(this.data);
-                b.Append("</p>\n");
-                break;
+        case BlockType_dl:
+            b.Append("<dl>\n");
+            this.RenderChildren(m, b);
+            b.Append("</dl>\n");
+            return;
+
+        case BlockType_p_footnote:
+            b.Append("<p>");
+            if (this.contentLen > 0) {
+                m.m_SpanFormatter.Format(b, this.buf, this.contentStart, this.contentLen);
+                b.Append("&nbsp;");
+            }
+            b.Append(this.data);
+            b.Append("</p>\n");
+            break;
 
         }
-    }
-
-    p.RevertToPlain = function () {
+    };
+    p.RevertToPlain = function() {
         this.blockType = BlockType_p;
         this.contentStart = this.lineStart;
         this.contentLen = this.lineLen;
-    }
-
-    p.get_contentEnd = function () {
+    };
+    p.get_contentEnd = function() {
         return this.contentStart + this.contentLen;
-    }
-
-    p.set_contentEnd = function (value) {
+    };
+    p.set_contentEnd = function(value) {
         this.contentLen = value - this.contentStart;
-    }
-
-    // Count the leading spaces on a block
+    }; // Count the leading spaces on a block
     // Used by list item evaluation to determine indent levels
     // irrespective of indent line type.
-    p.get_leadingSpaces = function () {
+    p.get_leadingSpaces = function() {
         var count = 0;
         for (var i = this.lineStart; i < this.lineStart + this.lineLen; i++) {
             if (this.buf.charAt(i) == ' ') {
                 count++;
-            }
-            else {
+            } else {
                 break;
             }
         }
         return count;
-    }
-
-    p.CopyFrom = function (other) {
+    };
+    p.CopyFrom = function(other) {
         this.blockType = other.blockType;
         this.buf = other.buf;
         this.contentStart = other.contentStart;
@@ -2850,9 +2779,7 @@ var MarkdownDeep = new function () {
         this.lineStart = other.lineStart;
         this.lineLen = other.lineLen;
         return this;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////
+    }; /////////////////////////////////////////////////////////////////////////////
     // BlockProcessor
 
 
@@ -2864,21 +2791,19 @@ var MarkdownDeep = new function () {
 
     p = BlockProcessor.prototype;
 
-    p.Process = function (str) {
+    p.Process = function(str) {
         // Reset string scanner
         var p = new StringScanner(str);
 
         return this.ScanLines(p);
-    }
-
-    p.ProcessRange = function (str, startOffset, len) {
+    };
+    p.ProcessRange = function(str, startOffset, len) {
         // Reset string scanner
         var p = new StringScanner(str, startOffset, len);
 
         return this.ScanLines(p);
-    }
-
-    p.StartTable = function (p, spec, lines) {
+    };
+    p.StartTable = function(p, spec, lines) {
         // Mustn't have more than 1 preceeding line
         if (lines.length > 1)
             return false;
@@ -2909,11 +2834,8 @@ var MarkdownDeep = new function () {
         }
 
         return true;
-    }
-
-
-
-    p.ScanLines = function (p) {
+    };
+    p.ScanLines = function(p) {
         // The final set of blocks will be collected here
         var blocks = [];
 
@@ -2962,14 +2884,12 @@ var MarkdownDeep = new function () {
                     // `===` gets converted to normal paragraph
                     b.RevertToPlain();
                     lines.push(b);
-                }
-                else {
+                } else {
                     // `---` gets converted to hr
                     if (b.contentLen >= 3) {
                         b.blockType = BlockType_hr;
                         blocks.push(b);
-                    }
-                    else {
+                    } else {
                         b.RevertToPlain();
                         lines.push(b);
                     }
@@ -2993,8 +2913,7 @@ var MarkdownDeep = new function () {
                     // on as if nothing happened
                     p.m_position = savepos;
                     b.RevertToPlain();
-                }
-                else {
+                } else {
                     blocks.push(b);
                     continue;
                 }
@@ -3002,164 +2921,161 @@ var MarkdownDeep = new function () {
 
             // Process this line
             switch (b.blockType) {
+            case BlockType_Blank:
+                switch (currentBlockType) {
                 case BlockType_Blank:
-                    switch (currentBlockType) {
-                        case BlockType_Blank:
-                            this.FreeBlock(b);
-                            break;
-
-                        case BlockType_p:
-                            this.CollapseLines(blocks, lines);
-                            this.FreeBlock(b);
-                            break;
-
-                        case BlockType_quote:
-                        case BlockType_ol_li:
-                        case BlockType_ul_li:
-                        case BlockType_dd:
-                        case BlockType_footnote:
-                        case BlockType_indent:
-                            lines.push(b);
-                            break;
-                    }
+                    this.FreeBlock(b);
                     break;
 
                 case BlockType_p:
-                    switch (currentBlockType) {
-                        case BlockType_Blank:
-                        case BlockType_p:
-                            lines.push(b);
-                            break;
+                    this.CollapseLines(blocks, lines);
+                    this.FreeBlock(b);
+                    break;
 
-                        case BlockType_quote:
-                        case BlockType_ol_li:
-                        case BlockType_ul_li:
-                        case BlockType_dd:
-                        case BlockType_footnote:
-                            var prevline = lines[lines.length - 1];
-                            if (prevline.blockType == BlockType_Blank) {
-                                this.CollapseLines(blocks, lines);
-                                lines.push(b);
-                            }
-                            else {
-                                lines.push(b);
-                            }
-                            break;
+                case BlockType_quote:
+                case BlockType_ol_li:
+                case BlockType_ul_li:
+                case BlockType_dd:
+                case BlockType_footnote:
+                case BlockType_indent:
+                    lines.push(b);
+                    break;
+                }
+                break;
 
-                        case BlockType_indent:
-                            this.CollapseLines(blocks, lines);
-                            lines.push(b);
-                            break;
+            case BlockType_p:
+                switch (currentBlockType) {
+                case BlockType_Blank:
+                case BlockType_p:
+                    lines.push(b);
+                    break;
+
+                case BlockType_quote:
+                case BlockType_ol_li:
+                case BlockType_ul_li:
+                case BlockType_dd:
+                case BlockType_footnote:
+                    var prevline = lines[lines.length - 1];
+                    if (prevline.blockType == BlockType_Blank) {
+                        this.CollapseLines(blocks, lines);
+                        lines.push(b);
+                    } else {
+                        lines.push(b);
                     }
                     break;
 
                 case BlockType_indent:
-                    switch (currentBlockType) {
-                        case BlockType_Blank:
-                            // Start a code block
-                            lines.push(b);
-                            break;
+                    this.CollapseLines(blocks, lines);
+                    lines.push(b);
+                    break;
+                }
+                break;
 
-                        case BlockType_p:
-                        case BlockType_quote:
-                            var prevline = lines[lines.length - 1];
-                            if (prevline.blockType == BlockType_Blank) {
-                                // Start a code block after a paragraph
-                                this.CollapseLines(blocks, lines);
-                                lines.push(b);
-                            }
-                            else {
-                                // indented line in paragraph, just continue it
-                                b.RevertToPlain();
-                                lines.push(b);
-                            }
-                            break;
+            case BlockType_indent:
+                switch (currentBlockType) {
+                case BlockType_Blank:
+                    // Start a code block
+                    lines.push(b);
+                    break;
 
-
-                        case BlockType_ol_li:
-                        case BlockType_ul_li:
-                        case BlockType_indent:
-                        case BlockType_dd:
-                        case BlockType_footnote:
-                            lines.push(b);
-                            break;
+                case BlockType_p:
+                case BlockType_quote:
+                    var prevline = lines[lines.length - 1];
+                    if (prevline.blockType == BlockType_Blank) {
+                        // Start a code block after a paragraph
+                        this.CollapseLines(blocks, lines);
+                        lines.push(b);
+                    } else {
+                        // indented line in paragraph, just continue it
+                        b.RevertToPlain();
+                        lines.push(b);
                     }
                     break;
 
+
+                case BlockType_ol_li:
+                case BlockType_ul_li:
+                case BlockType_indent:
+                case BlockType_dd:
+                case BlockType_footnote:
+                    lines.push(b);
+                    break;
+                }
+                break;
+
+            case BlockType_quote:
+                if (currentBlockType != BlockType_quote) {
+                    this.CollapseLines(blocks, lines);
+                }
+                lines.push(b);
+                break;
+
+            case BlockType_ol_li:
+            case BlockType_ul_li:
+                switch (currentBlockType) {
+                case BlockType_Blank:
+                    lines.push(b);
+                    break;
+
+                case BlockType_p:
                 case BlockType_quote:
-                    if (currentBlockType != BlockType_quote) {
+                    var prevline = lines[lines.length - 1];
+                    if (prevline.blockType == BlockType_Blank || this.m_parentType == BlockType_ol_li || this.m_parentType == BlockType_ul_li || this.m_parentType == BlockType_dd) {
+                        // List starting after blank line after paragraph or quote
+                        this.CollapseLines(blocks, lines);
+                        lines.push(b);
+                    } else {
+                        // List's can't start in middle of a paragraph
+                        b.RevertToPlain();
+                        lines.push(b);
+                    }
+                    break;
+
+                case BlockType_ol_li:
+                case BlockType_ul_li:
+                    if (b.blockType != BlockType_ol_li && b.blockType != BlockType_ul_li) {
+                        this.CollapseLines(blocks, lines);
+                    }
+                    lines.push(b);
+                    break;
+                case BlockType_dd:
+                case BlockType_footnote:
+                    if (b.blockType != currentBlockType) {
                         this.CollapseLines(blocks, lines);
                     }
                     lines.push(b);
                     break;
 
-                case BlockType_ol_li:
-                case BlockType_ul_li:
-                    switch (currentBlockType) {
-                        case BlockType_Blank:
-                            lines.push(b);
-                            break;
-
-                        case BlockType_p:
-                        case BlockType_quote:
-                            var prevline = lines[lines.length - 1];
-                            if (prevline.blockType == BlockType_Blank || this.m_parentType == BlockType_ol_li || this.m_parentType == BlockType_ul_li || this.m_parentType == BlockType_dd) {
-                                // List starting after blank line after paragraph or quote
-                                this.CollapseLines(blocks, lines);
-                                lines.push(b);
-                            }
-                            else {
-                                // List's can't start in middle of a paragraph
-                                b.RevertToPlain();
-                                lines.push(b);
-                            }
-                            break;
-
-                        case BlockType_ol_li:
-                        case BlockType_ul_li:
-                            if (b.blockType != BlockType_ol_li && b.blockType != BlockType_ul_li) {
-                                this.CollapseLines(blocks, lines);
-                            }
-                            lines.push(b);
-                            break;
-                        case BlockType_dd:
-                        case BlockType_footnote:
-                            if (b.blockType != currentBlockType) {
-                                this.CollapseLines(blocks, lines);
-                            }
-                            lines.push(b);
-                            break;
-
-                        case BlockType_indent:
-                            // List after code block
-                            this.CollapseLines(blocks, lines);
-                            lines.push(b);
-                            break;
-                    }
+                case BlockType_indent:
+                    // List after code block
+                    this.CollapseLines(blocks, lines);
+                    lines.push(b);
                     break;
+                }
+                break;
 
+            case BlockType_dd:
+            case BlockType_footnote:
+                switch (currentBlockType) {
+                case BlockType_Blank:
+                case BlockType_p:
                 case BlockType_dd:
                 case BlockType_footnote:
-                    switch (currentBlockType) {
-                        case BlockType_Blank:
-                        case BlockType_p:
-                        case BlockType_dd:
-                        case BlockType_footnote:
-                            this.CollapseLines(blocks, lines);
-                            lines.push(b);
-                            break;
-
-                        default:
-                            b.RevertToPlain();
-                            lines.push(b);
-                            break;
-                    }
+                    this.CollapseLines(blocks, lines);
+                    lines.push(b);
                     break;
 
                 default:
-                    this.CollapseLines(blocks, lines);
-                    blocks.push(b);
+                    b.RevertToPlain();
+                    lines.push(b);
                     break;
+                }
+                break;
+
+            default:
+                this.CollapseLines(blocks, lines);
+                blocks.push(b);
+                break;
             }
         }
 
@@ -3170,31 +3086,26 @@ var MarkdownDeep = new function () {
         }
 
         return blocks;
-    }
-
-    p.CreateBlock = function (lineStart) {
+    };
+    p.CreateBlock = function(lineStart) {
         var b;
         if (this.m_Markdown.m_SpareBlocks.length > 1) {
             b = this.m_Markdown.m_SpareBlocks.pop();
-        }
-        else {
+        } else {
             b = new Block();
         }
         b.lineStart = lineStart;
         return b;
-    }
-
-    p.FreeBlock = function (b) {
+    };
+    p.FreeBlock = function(b) {
         this.m_Markdown.m_SpareBlocks.push(b);
-    }
-
-    p.FreeBlocks = function (blocks) {
+    };
+    p.FreeBlocks = function(blocks) {
         for (var i = 0; i < blocks.length; i++)
             this.m_Markdown.m_SpareBlocks.push(blocks[i]);
         blocks.length = 0;
-    }
-
-    p.RenderLines = function (lines) {
+    };
+    p.RenderLines = function(lines) {
         var b = this.m_Markdown.GetStringBuilder();
         for (var i = 0; i < lines.length; i++) {
             var l = lines[i];
@@ -3202,9 +3113,8 @@ var MarkdownDeep = new function () {
             b.Append('\n');
         }
         return b.ToString();
-    }
-
-    p.CollapseLines = function (blocks, lines) {
+    };
+    p.CollapseLines = function(blocks, lines) {
         // Remove trailing blank lines
         while (lines.length > 0 && lines[lines.length - 1].blockType == BlockType_Blank) {
             this.FreeBlock(lines.pop());
@@ -3218,87 +3128,86 @@ var MarkdownDeep = new function () {
 
         // What sort of block?
         switch (lines[0].blockType) {
-            case BlockType_p:
-                // Collapse all lines into a single paragraph
-                var para = this.CreateBlock(lines[0].lineStart);
-                para.blockType = BlockType_p;
-                para.buf = lines[0].buf;
-                para.contentStart = lines[0].contentStart;
-                para.set_contentEnd(lines[lines.length - 1].get_contentEnd());
-                blocks.push(para);
-                this.FreeBlocks(lines);
-                break;
+        case BlockType_p:
+            // Collapse all lines into a single paragraph
+            var para = this.CreateBlock(lines[0].lineStart);
+            para.blockType = BlockType_p;
+            para.buf = lines[0].buf;
+            para.contentStart = lines[0].contentStart;
+            para.set_contentEnd(lines[lines.length - 1].get_contentEnd());
+            blocks.push(para);
+            this.FreeBlocks(lines);
+            break;
 
-            case BlockType_quote:
-                // Get the content
-                var str = this.RenderLines(lines);
+        case BlockType_quote:
+            // Get the content
+            var str = this.RenderLines(lines);
 
-                // Create the new block processor
-                var bp = new BlockProcessor(this.m_Markdown, this.m_bMarkdownInHtml);
-                bp.m_parentType = BlockType_quote;
+            // Create the new block processor
+            var bp = new BlockProcessor(this.m_Markdown, this.m_bMarkdownInHtml);
+            bp.m_parentType = BlockType_quote;
 
-                // Create a new quote block
-                var quote = this.CreateBlock(lines[0].lineStart);
-                quote.blockType = BlockType_quote;
-                quote.children = bp.Process(str);
-                this.FreeBlocks(lines);
-                blocks.push(quote);
-                break;
+            // Create a new quote block
+            var quote = this.CreateBlock(lines[0].lineStart);
+            quote.blockType = BlockType_quote;
+            quote.children = bp.Process(str);
+            this.FreeBlocks(lines);
+            blocks.push(quote);
+            break;
 
-            case BlockType_ol_li:
-            case BlockType_ul_li:
-                blocks.push(this.BuildList(lines));
-                break;
+        case BlockType_ol_li:
+        case BlockType_ul_li:
+            blocks.push(this.BuildList(lines));
+            break;
 
-            case BlockType_dd:
-                if (blocks.length > 0) {
-                    var prev = blocks[blocks.length - 1];
-                    switch (prev.blockType) {
-                        case BlockType_p:
-                            prev.blockType = BlockType_dt;
-                            break;
+        case BlockType_dd:
+            if (blocks.length > 0) {
+                var prev = blocks[blocks.length - 1];
+                switch (prev.blockType) {
+                case BlockType_p:
+                    prev.blockType = BlockType_dt;
+                    break;
 
-                        case BlockType_dd:
-                            break;
+                case BlockType_dd:
+                    break;
 
-                        default:
-                            var wrapper = this.CreateBlock(prev.lineStart);
-                            wrapper.blockType = BlockType_dt;
-                            wrapper.children = [];
-                            wrapper.children.push(prev);
-                            blocks.pop();
-                            blocks.push(wrapper);
-                            break;
-                    }
-
+                default:
+                    var wrapper = this.CreateBlock(prev.lineStart);
+                    wrapper.blockType = BlockType_dt;
+                    wrapper.children = [];
+                    wrapper.children.push(prev);
+                    blocks.pop();
+                    blocks.push(wrapper);
+                    break;
                 }
-                blocks.push(this.BuildDefinition(lines));
-                break;
 
-            case BlockType_footnote:
-                this.m_Markdown.AddFootnote(this.BuildFootnote(lines));
-                break;
+            }
+            blocks.push(this.BuildDefinition(lines));
+            break;
+
+        case BlockType_footnote:
+            this.m_Markdown.AddFootnote(this.BuildFootnote(lines));
+            break;
 
 
-            case BlockType_indent:
-                var codeblock = this.CreateBlock(lines[0].lineStart);
-                codeblock.blockType = BlockType_codeblock;
-                codeblock.children = [];
-                var firstline = lines[0].get_Content();
-                if (firstline.substr(0, 2) == "{{" && firstline.substr(firstline.length - 2, 2) == "}}") {
-                    codeblock.data = firstline.substr(2, firstline.length - 4);
-                    lines.splice(0, 1);
-                }
-                for (var i = 0; i < lines.length; i++) {
-                    codeblock.children.push(lines[i]);
-                }
-                blocks.push(codeblock);
-                lines.length = 0;
-                break;
+        case BlockType_indent:
+            var codeblock = this.CreateBlock(lines[0].lineStart);
+            codeblock.blockType = BlockType_codeblock;
+            codeblock.children = [];
+            var firstline = lines[0].get_Content();
+            if (firstline.substr(0, 2) == "{{" && firstline.substr(firstline.length - 2, 2) == "}}") {
+                codeblock.data = firstline.substr(2, firstline.length - 4);
+                lines.splice(0, 1);
+            }
+            for (var i = 0; i < lines.length; i++) {
+                codeblock.children.push(lines[i]);
+            }
+            blocks.push(codeblock);
+            lines.length = 0;
+            break;
         }
-    }
-
-    p.EvaluateLine = function (p) {
+    };
+    p.EvaluateLine = function(p) {
         // Create a block
         var b = this.CreateBlock(p.m_position);
 
@@ -3326,9 +3235,8 @@ var MarkdownDeep = new function () {
 
         // Create block
         return b;
-    }
-
-    p.EvaluateLineInternal = function (p, b) {
+    };
+    p.EvaluateLineInternal = function(p, b) {
         // Empty line?
         if (p.eol())
             return BlockType_Blank;
@@ -3433,12 +3341,10 @@ var MarkdownDeep = new function () {
             if (p.current() == ' ') {
                 if (tabPos < 0)
                     leadingSpaces++;
-            }
-            else if (p.current() == '\t') {
+            } else if (p.current() == '\t') {
                 if (tabPos < 0)
                     tabPos = p.m_position;
-            }
-            else {
+            } else {
                 // Something else, get out
                 break;
             }
@@ -3513,7 +3419,10 @@ var MarkdownDeep = new function () {
             }
 
             if (p.eol() && count >= 3) {
-                return BlockType_hr;
+                if (this.m_Markdown.UserBreaks)
+                    return BlockType_user_break;
+                else
+                    return BlockType_hr;
             }
 
             // Rewind
@@ -3613,15 +3522,14 @@ var MarkdownDeep = new function () {
 
         // Nothing special
         return BlockType_p;
-    }
-
+    };
     var MarkdownInHtmlMode_NA = 0;
     var MarkdownInHtmlMode_Block = 1;
     var MarkdownInHtmlMode_Span = 2;
     var MarkdownInHtmlMode_Deep = 3;
     var MarkdownInHtmlMode_Off = 4;
 
-    p.GetMarkdownMode = function (tag) {
+    p.GetMarkdownMode = function(tag) {
         // Get the markdown attribute
         var md = tag.attributes["markdown"];
         if (md == undefined) {
@@ -3648,9 +3556,8 @@ var MarkdownDeep = new function () {
             return MarkdownInHtmlMode_Span;
 
         return MarkdownInHtmlMode_Off;
-    }
-
-    p.ProcessMarkdownEnabledHtml = function (p, b, openingTag, mode) {
+    };
+    p.ProcessMarkdownEnabledHtml = function(p, b, openingTag, mode) {
         // Current position is just after the opening tag
 
         // Scan until we find matching closing tag
@@ -3695,47 +3602,45 @@ var MarkdownDeep = new function () {
                         b.set_contentEnd(p.m_position);
 
                         switch (mode) {
-                            case MarkdownInHtmlMode_Span:
+                        case MarkdownInHtmlMode_Span:
+                            var span = this.CreateBlock(inner_pos);
+                            span.buf = p.buf;
+                            span.blockType = BlockType_span;
+                            span.contentStart = inner_pos;
+                            span.contentLen = tagpos - inner_pos;
+
+                            b.children = [];
+                            b.children.push(span);
+                            break;
+
+                        case MarkdownInHtmlMode_Block:
+                        case MarkdownInHtmlMode_Deep:
+                            // Scan the internal content
+                            var bp = new BlockProcessor(this.m_Markdown, mode == MarkdownInHtmlMode_Deep);
+                            b.children = bp.ProcessRange(p.buf, inner_pos, tagpos - inner_pos);
+                            break;
+
+                        case MarkdownInHtmlMode_Off:
+                            if (bHasUnsafeContent) {
+                                b.blockType = BlockType_unsafe_html;
+                                b.set_contentEnd(p.m_position);
+                            } else {
                                 var span = this.CreateBlock(inner_pos);
                                 span.buf = p.buf;
-                                span.blockType = BlockType_span;
+                                span.blockType = BlockType_html;
                                 span.contentStart = inner_pos;
                                 span.contentLen = tagpos - inner_pos;
 
                                 b.children = [];
                                 b.children.push(span);
-                                break;
-
-                            case MarkdownInHtmlMode_Block:
-                            case MarkdownInHtmlMode_Deep:
-                                // Scan the internal content
-                                var bp = new BlockProcessor(this.m_Markdown, mode == MarkdownInHtmlMode_Deep);
-                                b.children = bp.ProcessRange(p.buf, inner_pos, tagpos - inner_pos);
-                                break;
-
-                            case MarkdownInHtmlMode_Off:
-                                if (bHasUnsafeContent) {
-                                    b.blockType = BlockType_unsafe_html;
-                                    b.set_contentEnd(p.m_position);
-                                }
-                                else {
-                                    var span = this.CreateBlock(inner_pos);
-                                    span.buf = p.buf;
-                                    span.blockType = BlockType_html;
-                                    span.contentStart = inner_pos;
-                                    span.contentLen = tagpos - inner_pos;
-
-                                    b.children = [];
-                                    b.children.push(span);
-                                }
-                                break;
+                            }
+                            break;
                         }
 
 
                         return true;
                     }
-                }
-                else {
+                } else {
                     depth++;
                 }
             }
@@ -3743,9 +3648,8 @@ var MarkdownDeep = new function () {
 
         // Missing closing tag(s).  
         return false;
-    }
-
-    p.ScanHtml = function (p, b) {
+    };
+    p.ScanHtml = function(p, b) {
         // Remember start of html
         var posStartPiece = p.m_position;
 
@@ -3853,8 +3757,7 @@ var MarkdownDeep = new function () {
                         posStartPiece = p.m_position;
 
                         continue;
-                    }
-                    else {
+                    } else {
                         this.FreeBlock(markdownBlock);
                     }
                 }
@@ -3912,8 +3815,7 @@ var MarkdownDeep = new function () {
                         b.contentLen = p.m_position - b.contentStart;
                         return true;
                     }
-                }
-                else {
+                } else {
                     depth++;
                 }
             }
@@ -3921,12 +3823,10 @@ var MarkdownDeep = new function () {
 
         // Missing closing tag(s).  
         return BlockType_Blank;
-    }
-
-    /* 
+    }; /* 
     * BuildList - build a single <ol> or <ul> list
     */
-    p.BuildList = function (lines) {
+    p.BuildList = function(lines) {
         // What sort of list are we dealing with
         var listType = lines[0].blockType;
 
@@ -3939,7 +3839,7 @@ var MarkdownDeep = new function () {
         for (var i = 1; i < lines.length; i++) {
             // Join plain paragraphs
             if ((lines[i].blockType == BlockType_p) &&
-				(lines[i - 1].blockType == BlockType_p || lines[i - 1].blockType == BlockType_ul_li || lines[i - 1].blockType == BlockType_ol_li)) {
+            (lines[i - 1].blockType == BlockType_p || lines[i - 1].blockType == BlockType_ul_li || lines[i - 1].blockType == BlockType_ol_li)) {
                 lines[i - 1].set_contentEnd(lines[i].get_contentEnd());
                 this.FreeBlock(lines[i]);
                 lines.splice(i, 1);
@@ -3982,8 +3882,7 @@ var MarkdownDeep = new function () {
             if (start_of_li == end_of_li) {
                 // It's a simple, single line item item
                 List.children.push(this.CreateBlock().CopyFrom(lines[i]));
-            }
-            else {
+            } else {
                 // Build a new string containing all child items
                 var bAnyBlanks = false;
                 var sb = this.m_Markdown.GetStringBuilder();
@@ -4030,17 +3929,15 @@ var MarkdownDeep = new function () {
 
         // Continue processing after this item
         return List;
-    }
-
-    /* 
+    }; /* 
     * BuildDefinition - build a single <dd> item
     */
-    p.BuildDefinition = function (lines) {
+    p.BuildDefinition = function(lines) {
         // Collapse all plain lines (ie: handle hardwrapped lines)
         for (var i = 1; i < lines.length; i++) {
             // Join plain paragraphs
             if ((lines[i].blockType == BlockType_p) &&
-				(lines[i - 1].blockType == BlockType_p || lines[i - 1].blockType == BlockType_dd)) {
+            (lines[i - 1].blockType == BlockType_p || lines[i - 1].blockType == BlockType_dd)) {
                 lines[i - 1].set_contentEnd(lines[i].get_contentEnd());
                 this.FreeBlock(lines[i]);
                 lines.splice(i, 1);
@@ -4077,41 +3974,38 @@ var MarkdownDeep = new function () {
 
         // Continue processing after this item
         return item;
-    }
-
-    p.BuildDefinitionLists = function (blocks) {
+    };
+    p.BuildDefinitionLists = function(blocks) {
         var currentList = null;
         for (var i = 0; i < blocks.length; i++) {
             switch (blocks[i].blockType) {
-                case BlockType_dt:
-                case BlockType_dd:
-                    if (currentList == null) {
-                        currentList = this.CreateBlock(blocks[i].lineStart);
-                        currentList.blockType = BlockType_dl;
-                        currentList.children = [];
-                        blocks.splice(i, 0, currentList);
-                        i++;
-                    }
+            case BlockType_dt:
+            case BlockType_dd:
+                if (currentList == null) {
+                    currentList = this.CreateBlock(blocks[i].lineStart);
+                    currentList.blockType = BlockType_dl;
+                    currentList.children = [];
+                    blocks.splice(i, 0, currentList);
+                    i++;
+                }
 
-                    currentList.children.push(blocks[i]);
-                    blocks.splice(i, 1);
-                    i--;
-                    break;
+                currentList.children.push(blocks[i]);
+                blocks.splice(i, 1);
+                i--;
+                break;
 
-                default:
-                    currentList = null;
-                    break;
+            default:
+                currentList = null;
+                break;
             }
         }
-    }
-
-
-    p.BuildFootnote = function (lines) {
+    };
+    p.BuildFootnote = function(lines) {
         // Collapse all plain lines (ie: handle hardwrapped lines)
         for (var i = 1; i < lines.length; i++) {
             // Join plain paragraphs
             if ((lines[i].blockType == BlockType_p) &&
-				(lines[i - 1].blockType == BlockType_p || lines[i - 1].blockType == BlockType_footnote)) {
+            (lines[i - 1].blockType == BlockType_p || lines[i - 1].blockType == BlockType_footnote)) {
                 lines[i - 1].set_contentEnd(lines[i].get_contentEnd());
                 this.FreeBlock(lines[i]);
                 lines.splice(i, 1);
@@ -4142,10 +4036,8 @@ var MarkdownDeep = new function () {
 
         // Continue processing after this item
         return item;
-    }
-
-
-    p.ProcessFencedCodeBlock = function (p, b) {
+    };
+    p.ProcessFencedCodeBlock = function(p, b) {
         var fenceStart = p.m_position;
 
         var delim = p.current();
@@ -4205,9 +4097,7 @@ var MarkdownDeep = new function () {
 
         // Done
         return true;
-    }
-
-
+    };
     var ColumnAlignment_NA = 0;
     var ColumnAlignment_Left = 1;
     var ColumnAlignment_Right = 2;
@@ -4224,11 +4114,11 @@ var MarkdownDeep = new function () {
     p.LeadingBar = false;
     p.TrailingBar = false;
 
-    p.ParseRow = function (p) {
+    p.ParseRow = function(p) {
         p.SkipLinespace();
 
         if (p.eol())
-            return null; 	// Blank line ends the table
+            return null; // Blank line ends the table
 
         var bAnyBars = this.LeadingBar;
         if (this.LeadingBar && !p.SkipChar('|')) {
@@ -4263,24 +4153,23 @@ var MarkdownDeep = new function () {
 
         p.SkipEol();
         return row;
-    }
-
-    p.RenderRow = function (m, b, row, type) {
+    };
+    p.RenderRow = function(m, b, row, type) {
         for (var i = 0; i < row.length; i++) {
             b.Append("\t<");
             b.Append(type);
 
             if (i < this.m_Columns.length) {
                 switch (this.m_Columns[i]) {
-                    case ColumnAlignment_Left:
-                        b.Append(" align=\"left\"");
-                        break;
-                    case ColumnAlignment_Right:
-                        b.Append(" align=\"right\"");
-                        break;
-                    case ColumnAlignment_Center:
-                        b.Append(" align=\"center\"");
-                        break;
+                case ColumnAlignment_Left:
+                    b.Append(" align=\"left\"");
+                    break;
+                case ColumnAlignment_Right:
+                    b.Append(" align=\"right\"");
+                    break;
+                case ColumnAlignment_Center:
+                    b.Append(" align=\"center\"");
+                    break;
                 }
             }
 
@@ -4290,9 +4179,8 @@ var MarkdownDeep = new function () {
             b.Append(type);
             b.Append(">\n");
         }
-    }
-
-    p.Render = function (m, b) {
+    };
+    p.Render = function(m, b) {
         b.Append("<table>\n");
         if (this.m_Headers != null) {
             b.Append("<thead>\n<tr>\n");
@@ -4310,7 +4198,7 @@ var MarkdownDeep = new function () {
         b.Append("</tbody>\n");
 
         b.Append("</table>\n");
-    }
+    };
 
     function TableSpec_Parse(p) {
         // Leading line space allowed
@@ -4389,9 +4277,11 @@ var MarkdownDeep = new function () {
     // Exposed stuff
     this.Markdown = Markdown;
     this.HtmlTag = HtmlTag;
-} ();
+    this.SplitUserSections = SplitUserSections;
+}();
 
 // Export to nodejs
-if (typeof exports !== 'undefined')
+if (typeof exports !== 'undefined') {
     exports.Markdown = MarkdownDeep.Markdown;
-
+    exports.SplitUserSections = MarkdownDeep.SplitUserSections;
+}

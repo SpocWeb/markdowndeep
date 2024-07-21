@@ -1,170 +1,131 @@
-﻿// 
-//   MarkdownDeep - http://www.toptensoftware.com/markdowndeep
-//	 Copyright (C) 2010-2011 Topten Software
-// 
-//   Licensed under the Apache License, Version 2.0 (the "License"); you may not use this product except in 
-//   compliance with the License. You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-//   Unless required by applicable law or agreed to in writing, software distributed under the License is 
-//   distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-//   See the License for the specific language governing permissions and limitations under the License.
-//
+﻿using System;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace MarkdownDeep {
 
-namespace MarkdownDeep
-{
-	/*
-	 * StringScanner is a simple class to help scan through an input string.
-	 * 
-	 * Maintains a current position with various operations to inspect the current
-	 * character, skip forward, check for matches, skip whitespace etc...
-	 */
-	public class StringScanner
-	{
-		// Constructor
-		public StringScanner()
-		{
-		}
+	/// <summary> simple class to help scan through an input string. </summary>
+	/// <remarks>
+	/// Maintains a current position with various operations 
+	/// to inspect the current character, skip forward, check for matches, skip whitespace etc.
+	/// </remarks>
+	public class StringScanner {
+
+		int _End;
+		int _Mark;
+		int _Pos;
+		int _Start;
+
+		public StringScanner() {}
 
 		// Constructor
-		public StringScanner(string str)
-		{
+		public StringScanner(string str) {
 			Reset(str);
 		}
 
 		// Constructor
-		public StringScanner(string str, int pos)
-		{
+		public StringScanner(string str, int pos) {
 			Reset(str, pos);
 		}
 
 		// Constructor
-		public StringScanner(string str, int pos, int len)
-		{
+		public StringScanner(string str, int pos, int len) {
 			Reset(str, pos, len);
 		}
 
 		// Reset
-		public void Reset(string str)
-		{
-			Reset(str, 0, str!=null ? str.Length : 0);
-		}
-
-		// Reset
-		public void Reset(string str, int pos)
-		{
-			Reset(str, pos, str!=null ? str.Length - pos : 0);
-		}
-
-		// Reset
-		public void Reset(string str, int pos, int len)
-		{
-			if (str == null)
-				str = "";
-			if (len < 0)
-				len = 0;
-			if (pos < 0)
-				pos = 0;
-			if (pos > str.Length)
-				pos = str.Length;
-
-			this.str = str;
-			this.start = pos;
-			this.pos = pos;
-			this.end = pos + len;
-
-			if (end > str.Length)
-				end = str.Length;
-		}
 
 		// Get the entire input string
-		public string input
-		{
-			get
-			{
-				return str;
-			}
-		}
+		public string Input { get; private set; }
 
 		// Get the character at the current position
-		public char current
-		{
-			get
-			{
-				if (pos < start || pos >= end)
+		public char Current {
+			get {
+				if (_Pos < _Start || _Pos >= _End) {
 					return '\0';
-				else
-					return str[pos];
+				}
+				return Input[_Pos];
 			}
 		}
 
 		// Get/set the current position
-		public int position
-		{
-			get
-			{
-				return pos;
-			}
-			set
-			{
-				pos = value;
-			}
+		public int Position {
+			get { return _Pos; }
+			set { _Pos = value; }
 		}
 
 		// Get the remainder of the input 
 		// (use this in a watch window while debugging :)
-		public string remainder
-		{
-			get
-			{
-				return Substring(position);
+		public string Remainder => Substring(Position);
+
+		public bool Eof => _Pos >= _End;
+
+		// Are we at eol?
+		public bool Eol => IsLineEnd(Current);
+
+		// Are we at bof?
+		public bool Bof => _Pos == _Start;
+
+		public void Reset(string str) => Reset(str, 0, str?.Length ?? 0);
+
+		// Reset
+		public void Reset(string str, int pos) => Reset(str, pos, str?.Length - pos ?? 0);
+
+		// Reset
+		public void Reset(string str, int pos, int len) {
+			if (str == null) {
+				str = "";
+			}
+			if (len < 0) {
+				len = 0;
+			}
+			if (pos < 0) {
+				pos = 0;
+			}
+			if (pos > str.Length) {
+				pos = str.Length;
+			}
+
+			Input = str;
+			_Start = pos;
+			_Pos = pos;
+			_End = pos + len;
+
+			if (_End > str.Length) {
+				_End = str.Length;
 			}
 		}
 
 		// Skip to the end of file
-		public void SkipToEof()
-		{
-			pos = end;
-		}
+		public void SkipToEof() => _Pos = _End;
 
 
 		// Skip to the end of the current line
-		public void SkipToEol()
-		{
-			while (pos < end)
-			{
-				char ch=str[pos];
-				if (ch=='\r' || ch=='\n')
+		public void SkipToEol() {
+			while (_Pos < _End) {
+				char ch = Input[_Pos];
+				if (ch == '\r' || ch == '\n') {
 					break;
-				pos++;
+				}
+				_Pos++;
 			}
 		}
 
 		// Skip if currently at a line end
-		public bool SkipEol()
-		{
-			if (pos < end)
-			{
-				char ch = str[pos];
-				if (ch == '\r')
-				{
-					pos++;
-					if (pos < end && str[pos] == '\n')
-						pos++;
+		public bool SkipEol() {
+			if (_Pos < _End) {
+				char ch = Input[_Pos];
+				if (ch == '\r') {
+					_Pos++;
+					if (_Pos < _End && Input[_Pos] == '\n') {
+						_Pos++;
+					}
 					return true;
 				}
 
-				else if (ch == '\n')
-				{
-					pos++;
-					if (pos < end && str[pos] == '\r')
-						pos++;
+				if (ch == '\n') {
+					_Pos++;
+					if (_Pos < _End && Input[_Pos] == '\r') {
+						_Pos++;
+					}
 					return true;
 				}
 			}
@@ -173,48 +134,40 @@ namespace MarkdownDeep
 		}
 
 		// Skip to the next line
-		public void SkipToNextLine()
-		{
+		public void SkipToNextLine() {
 			SkipToEol();
 			SkipEol();
 		}
 
 		// Get the character at offset from current position
 		// Or, \0 if out of range
-		public char CharAtOffset(int offset)
-		{
-			int index = pos + offset;
-			
-			if (index < start)
+		public char CharAtOffset(int offset) {
+			int index = _Pos + offset;
+
+			if (index < _Start) {
 				return '\0';
-			if (index >= end)
+			}
+			if (index >= _End) {
 				return '\0';
-			return str[index];
+			}
+			return Input[index];
 		}
 
 		// Skip a number of characters
-		public void SkipForward(int characters)
-		{
-			pos += characters;
-		}
+		public void SkipForward(int characters) => _Pos += characters;
 
-		// Skip a character if present
-		public bool SkipChar(char ch)
-		{
-			if (current == ch)
-			{
+		/// <summary> Skips the given character if present </summary>
+		public bool SkipChar(char ch) {
+			if (Current == ch) {
 				SkipForward(1);
 				return true;
 			}
-
-			return false;	
+			return false;
 		}
 
 		// Skip a matching string
-		public bool SkipString(string str)
-		{
-			if (DoesMatch(str))
-			{
+		public bool SkipString(string str) {
+			if (DoesMatch(str)) {
 				SkipForward(str.Length);
 				return true;
 			}
@@ -223,10 +176,8 @@ namespace MarkdownDeep
 		}
 
 		// Skip a matching string
-		public bool SkipStringI(string str)
-		{
-			if (DoesMatchI(str))
-			{
+		public bool SkipStringI(string str) {
+			if (DoesMatchI(str)) {
 				SkipForward(str.Length);
 				return true;
 			}
@@ -235,280 +186,222 @@ namespace MarkdownDeep
 		}
 
 		// Skip any whitespace
-		public bool SkipWhitespace()
-		{
-			if (!char.IsWhiteSpace(current))
+		public bool SkipWhitespace() {
+			if (!char.IsWhiteSpace(Current)) {
 				return false;
+			}
 			SkipForward(1);
 
-			while (char.IsWhiteSpace(current))
+			while (char.IsWhiteSpace(Current))
 				SkipForward(1);
 
 			return true;
 		}
 
 		// Check if a character is space or tab
-		public static bool IsLineSpace(char ch)
-		{
-			return ch == ' ' || ch == '\t';
-		}
+		public static bool IsLineSpace(char ch) => ch == ' ' || ch == '\t';
 
 		// Skip spaces and tabs
-		public bool SkipLinespace()
-		{
-			if (!IsLineSpace(current))
+		public bool SkipLinespace() {
+			if (!IsLineSpace(Current)) {
 				return false;
+			}
 			SkipForward(1);
 
-			while (IsLineSpace(current))
+			while (IsLineSpace(Current))
 				SkipForward(1);
 
 			return true;
 		}
 
 		// Does current character match something
-		public bool DoesMatch(char ch)
-		{
-			return current == ch;
-		}
+		public bool DoesMatch(char ch) => Current == ch;
 
 		// Does character at offset match a character
-		public bool DoesMatch(int offset, char ch)
-		{
-			return CharAtOffset(offset) == ch;
-		}
+		public bool DoesMatch(int offset, char ch) => CharAtOffset(offset) == ch;
 
 		// Does current character match any of a range of characters
-		public bool DoesMatchAny(char[] chars)
-		{
-			for (int i = 0; i < chars.Length; i++)
-			{
-				if (DoesMatch(chars[i]))
+		public bool DoesMatchAny(char[] chars) {
+			for (int i = 0; i < chars.Length; i++) {
+				if (DoesMatch(chars[i])) {
 					return true;
+				}
 			}
 			return false;
 		}
 
 		// Does current character match any of a range of characters
-		public bool DoesMatchAny(int offset, char[] chars)
-		{
-			for (int i = 0; i < chars.Length; i++)
-			{
-				if (DoesMatch(offset, chars[i]))
+		public bool DoesMatchAny(int offset, char[] chars) {
+			for (int i = 0; i < chars.Length; i++) {
+				if (DoesMatch(offset, chars[i])) {
 					return true;
+				}
 			}
 			return false;
 		}
 
 		// Does current string position match a string
-		public bool DoesMatch(string str)
-		{
-			for (int i = 0; i < str.Length; i++)
-			{
-				if (str[i] != CharAtOffset(i))
+		public bool DoesMatch(string str) {
+			for (int i = 0; i < str.Length; i++) {
+				if (str[i] != CharAtOffset(i)) {
 					return false;
+				}
 			}
 			return true;
 		}
 
 		// Does current string position match a string
-		public bool DoesMatchI(string str)
-		{
-			return string.Compare(str, Substring(position, str.Length), true) == 0;
-		}
+		public bool DoesMatchI(string str) => Substring(Position, str.Length).Equals(str, StringComparison.OrdinalIgnoreCase);
 
 		// Extract a substring
-		public string Substring(int start)
-		{
-			return str.Substring(start, end-start);
-		}
+		public string Substring(int start) => Input.Substring(start, _End - start);
 
 		// Extract a substring
-		public string Substring(int start, int len)
-		{
-			if (start + len > end)
-				len = end - start;
-
-			return str.Substring(start, len);
+		public string Substring(int start, int len) {
+			if (start + len > _End) {
+				len = _End - start;
+			}
+			return Input.Substring(start, len);
 		}
 
 		// Scan forward for a character
-		public bool Find(char ch)
-		{
-			if (pos >= end)
+		public bool Find(char ch) {
+			if (_Pos >= _End) {
 				return false;
+			}
 
 			// Find it
-			int index = str.IndexOf(ch, pos);
-			if (index < 0 || index>=end)
+			int index = Input.IndexOf(ch, _Pos);
+			if (index < 0 || index >= _End) {
 				return false;
+			}
 
 			// Store new position
-			pos = index;
+			_Pos = index;
 			return true;
 		}
 
 		// Find any of a range of characters
-		public bool FindAny(char[] chars)
-		{
-			if (pos >= end)
+		public bool FindAny(char[] chars) {
+			if (_Pos >= _End) {
 				return false;
+			}
 
 			// Find it
-			int index = str.IndexOfAny(chars, pos);
-			if (index < 0 || index>=end)
+			int index = Input.IndexOfAny(chars, _Pos);
+			if (index < 0 || index >= _End) {
 				return false;
+			}
 
 			// Store new position
-			pos = index;
+			_Pos = index;
 			return true;
 		}
 
 		// Forward scan for a string
-		public bool Find(string find)
-		{
-			if (pos >= end)
+		public bool Find(string find) {
+			if (_Pos >= _End) {
 				return false;
+			}
 
-			int index = str.IndexOf(find, pos);
-			if (index < 0 || index > end-find.Length)
+			int index = Input.IndexOf(find, _Pos, StringComparison.Ordinal);
+			if (index < 0 || index > _End - find.Length) {
 				return false;
+			}
 
-			pos = index;
+			_Pos = index;
 			return true;
 		}
 
 		// Forward scan for a string (case insensitive)
-		public bool FindI(string find)
-		{
-			if (pos >= end)
+		public bool FindI(string find) {
+			if (_Pos >= _End) {
 				return false;
+			}
 
-#if DOTNET_CORE
-			int index = str.IndexOf(find, pos, StringComparison.OrdinalIgnoreCase);
-#else
-			int index = str.IndexOf(find, pos, StringComparison.InvariantCultureIgnoreCase);
-#endif
-			
-			if (index < 0 || index >= end - find.Length)
+			int index = Input.IndexOf(find, _Pos, StringComparison.InvariantCultureIgnoreCase);
+			if (index < 0 || index >= _End - find.Length) {
 				return false;
+			}
 
-			pos = index;
+			_Pos = index;
 			return true;
 		}
 
 		// Are we at eof?
-		public bool eof
-		{
-			get
-			{
-				return pos >= end;
-			}
-		}
-
-		// Are we at eol?
-		public bool eol
-		{
-			get
-			{
-				return IsLineEnd(current);
-			}
-		}
-
-		// Are we at bof?
-		public bool bof
-		{
-			get
-			{
-				return pos == start;
-			}
-		}
 
 		// Mark current position
-		public void Mark()
-		{
-			mark = pos;
-		}
+		public void Mark() => _Mark = _Pos;
 
 		// Extract string from mark to current position
-		public string Extract()
-		{
-			if (mark >= pos)
+		public string Extract() {
+			if (_Mark >= _Pos) {
 				return "";
+			}
 
-			return str.Substring(mark, pos - mark);
+			return Input.Substring(_Mark, _Pos - _Mark);
 		}
 
 		// Skip an identifier
-		public bool SkipIdentifier(ref string identifier)
-		{
-			int savepos = position;
-			if (!Utils.ParseIdentifier(this.str, ref pos, ref identifier))
+		public bool SkipIdentifier(ref string identifier) {
+			int savepos = Position;
+			if (!Utils.ParseIdentifier(Input, ref _Pos, ref identifier)) {
 				return false;
-			if (pos >= end)
-			{
-				pos = savepos;
+			}
+			if (_Pos >= _End) {
+				_Pos = savepos;
 				return false;
 			}
 			return true;
 		}
 
-		public bool SkipFootnoteID(out string id)
-		{
-			int savepos = position;
+		public bool SkipFootnoteId(out string id) {
+			int savepos = Position;
 
 			SkipLinespace();
 
 			Mark();
 
-			while (true)
-			{
-				char ch = current;
-				if (char.IsLetterOrDigit(ch) || ch == '-' || ch == '_' || ch == ':' || ch == '.' || ch == ' ')
+			for(;;) {
+				char ch = Current;
+				if (char.IsLetterOrDigit(ch) || ch == '-' || ch == '_' || ch == ':' || ch == '.' || ch == ' ') {
 					SkipForward(1);
-				else
+				} else {
 					break;
+				}
 			}
 
-			if (position > mark)
-			{
+			if (Position > _Mark) {
 				id = Extract().Trim();
-				if (!String.IsNullOrEmpty(id))
-				{
+				if (!string.IsNullOrEmpty(id)) {
 					SkipLinespace();
 					return true;
 				}
 			}
 
-			position = savepos;
+			Position = savepos;
 			id = null;
 			return false;
 		}
 
 		// Skip a Html entity (eg: &amp;)
-		public bool SkipHtmlEntity(ref string entity)
-		{
-			int savepos = position;
-			if (!Utils.SkipHtmlEntity(this.str, ref pos, ref entity))
+		public bool SkipHtmlEntity(ref string entity) {
+			int savepos = Position;
+			if (!Utils.SkipHtmlEntity(Input, ref _Pos, ref entity)) {
 				return false;
-			if (pos > end)
-			{
-				pos = savepos;
+			}
+			if (_Pos > _End) {
+				_Pos = savepos;
 				return false;
 			}
 			return true;
 		}
 
 		// Check if a character marks end of line
-		public static bool IsLineEnd(char ch)
-		{
-			return ch == '\r' || ch == '\n' || ch=='\0';
-		}
+		public static bool IsLineEnd(char ch) => ch == '\r' || ch == '\n' || ch == '\0';
 
-		bool IsUrlChar(char ch)
-		{
-			switch (ch)
-			{
+		public static bool IsUrlChar(char ch) {
+			switch (ch) {
 				case '+':
 				case '&':
 				case '@':
@@ -532,15 +425,10 @@ namespace MarkdownDeep
 					return true;
 
 				default:
-					return Char.IsLetterOrDigit(ch);
+					return char.IsLetterOrDigit(ch);
 			}
 		}
 
 		// Attributes
-		string str;
-		int start;
-		int pos;
-		int end;
-		int mark;
 	}
 }
