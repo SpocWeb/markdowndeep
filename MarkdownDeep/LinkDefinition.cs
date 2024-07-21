@@ -10,7 +10,7 @@ namespace MarkdownDeep {
 	/// </remarks>
 	public class LinkDefinition {
 
-		public LinkDefinition(string id, string url = null, string title = null) {
+		public LinkDefinition(string id, string? url = null, string? title = null) {
 			Id = id;
 			Url = url;
 			Title = title;
@@ -18,9 +18,9 @@ namespace MarkdownDeep {
 
 		public string Id { get; set; }
 
-		public string Url { get; set; }
+		public string? Url { get; set; }
 
-		public string Title { get; set; }
+		public string? Title { get; set; }
 
 		internal void RenderLink(Markdown m, StringBuilder b, string linkText) {
 			if (Url.StartsWith("mailto:")) {
