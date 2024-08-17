@@ -2,6 +2,7 @@
 using System.Text;
 using MarkdownDeep;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace MarkdownDeepTests {
 
@@ -131,7 +132,7 @@ namespace MarkdownDeepTests {
 			Console.WriteLine("Actual:\n" + sep + actual);
 			Console.WriteLine("Expected:\n" + sep + expected);
 
-			Assert.AreEqual(expected_clean, actual_clean);
+			ClassicAssert.AreEqual(expected_clean, actual_clean);
 		}
 
         /*public static string TransformUsingJS(string inputText, bool SafeMode, bool ExtraMode, bool MarkdownInHtml,
@@ -187,7 +188,7 @@ namespace MarkdownDeepTests {
 			Console.WriteLine("Expected:\n" + sep + expected);
 
 			// Check it
-			Assert.AreEqual(expected, actual);
+			ClassicAssert.AreEqual(expected, actual);
 		}
 
 		public static void RunResourceTestJs(string resourceName) {

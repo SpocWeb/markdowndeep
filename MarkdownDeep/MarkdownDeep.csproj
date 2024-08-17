@@ -70,14 +70,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="coverlet.collector" Version="3.1.2">
+		<PackageReference Include="coverlet.collector" Version="6.0.2">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
-		<PackageReference Include="NullGuard.Fody" Version="3.1.0" />
-		<PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
-		<PackageReference Include="System.Drawing.Common" Version="8.0.7" />
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+		<PackageReference Include="NullGuard.Fody" Version="3.1.1" />
+		<PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
+		<PackageReference Include="System.Drawing.Common" Version="8.0.8" />
 	</ItemGroup>
 
 	<ItemGroup>

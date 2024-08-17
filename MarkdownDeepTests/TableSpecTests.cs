@@ -1,5 +1,6 @@
 ﻿using MarkdownDeep;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace MarkdownDeepTests {
 
@@ -17,40 +18,40 @@ namespace MarkdownDeepTests {
 		public void Alignment() {
 			TableSpec s = Parse("--|:--|--:|:--:");
 
-			Assert.IsNotNull(s);
-			Assert.IsFalse(s.LeadingBar);
-			Assert.IsFalse(s.TrailingBar);
-			Assert.AreEqual(4, s.Columns.Count);
-			Assert.AreEqual(ColumnAlignment.Na, s.Columns[0]);
-			Assert.AreEqual(ColumnAlignment.Left, s.Columns[1]);
-			Assert.AreEqual(ColumnAlignment.Right, s.Columns[2]);
-			Assert.AreEqual(ColumnAlignment.Center, s.Columns[3]);
+			ClassicAssert.IsNotNull(s);
+			ClassicAssert.IsFalse(s.LeadingBar);
+            ClassicAssert.IsFalse(s.TrailingBar);
+			ClassicAssert.AreEqual(4, s.Columns.Count);
+			ClassicAssert.AreEqual(ColumnAlignment.Na, s.Columns[0]);
+			ClassicAssert.AreEqual(ColumnAlignment.Left, s.Columns[1]);
+			ClassicAssert.AreEqual(ColumnAlignment.Right, s.Columns[2]);
+			ClassicAssert.AreEqual(ColumnAlignment.Center, s.Columns[3]);
 		}
 
 		[Test]
 		public void LeadingTrailingBars() {
 			TableSpec s = Parse("|--|:--|--:|:--:|");
 
-			Assert.IsNotNull(s);
-			Assert.IsTrue(s.LeadingBar);
-			Assert.IsTrue(s.TrailingBar);
-			Assert.AreEqual(4, s.Columns.Count);
-			Assert.AreEqual(ColumnAlignment.Na, s.Columns[0]);
-			Assert.AreEqual(ColumnAlignment.Left, s.Columns[1]);
-			Assert.AreEqual(ColumnAlignment.Right, s.Columns[2]);
-			Assert.AreEqual(ColumnAlignment.Center, s.Columns[3]);
+			ClassicAssert.IsNotNull(s);
+			ClassicAssert.IsTrue(s.LeadingBar);
+            ClassicAssert.IsTrue(s.TrailingBar);
+			ClassicAssert.AreEqual(4, s.Columns.Count);
+			ClassicAssert.AreEqual(ColumnAlignment.Na, s.Columns[0]);
+			ClassicAssert.AreEqual(ColumnAlignment.Left, s.Columns[1]);
+			ClassicAssert.AreEqual(ColumnAlignment.Right, s.Columns[2]);
+			ClassicAssert.AreEqual(ColumnAlignment.Center, s.Columns[3]);
 		}
 
 		[Test]
 		public void Simple() {
 			TableSpec s = Parse("--|--");
 
-			Assert.IsNotNull(s);
-			Assert.IsFalse(s.LeadingBar);
-			Assert.IsFalse(s.TrailingBar);
-			Assert.AreEqual(2, s.Columns.Count);
-			Assert.AreEqual(ColumnAlignment.Na, s.Columns[0]);
-			Assert.AreEqual(ColumnAlignment.Na, s.Columns[1]);
+			ClassicAssert.IsNotNull(s);
+			ClassicAssert.IsFalse(s.LeadingBar);
+            ClassicAssert.IsFalse(s.TrailingBar);
+			ClassicAssert.AreEqual(2, s.Columns.Count);
+			ClassicAssert.AreEqual(ColumnAlignment.Na, s.Columns[0]);
+			ClassicAssert.AreEqual(ColumnAlignment.Na, s.Columns[1]);
 		}
 
 
@@ -58,14 +59,14 @@ namespace MarkdownDeepTests {
 		public void Whitespace() {
 			TableSpec s = Parse(" | -- | :-- | --: | :--: |  ");
 
-			Assert.IsNotNull(s);
-			Assert.IsTrue(s.LeadingBar);
-			Assert.IsTrue(s.TrailingBar);
-			Assert.AreEqual(4, s.Columns.Count);
-			Assert.AreEqual(ColumnAlignment.Na, s.Columns[0]);
-			Assert.AreEqual(ColumnAlignment.Left, s.Columns[1]);
-			Assert.AreEqual(ColumnAlignment.Right, s.Columns[2]);
-			Assert.AreEqual(ColumnAlignment.Center, s.Columns[3]);
+			ClassicAssert.IsNotNull(s);
+			ClassicAssert.IsTrue(s.LeadingBar);
+            ClassicAssert.IsTrue(s.TrailingBar);
+			ClassicAssert.AreEqual(4, s.Columns.Count);
+			ClassicAssert.AreEqual(ColumnAlignment.Na, s.Columns[0]);
+			ClassicAssert.AreEqual(ColumnAlignment.Left, s.Columns[1]);
+			ClassicAssert.AreEqual(ColumnAlignment.Right, s.Columns[2]);
+			ClassicAssert.AreEqual(ColumnAlignment.Center, s.Columns[3]);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using MarkdownDeep;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace MarkdownDeepTests {
 	[TestFixture]
@@ -14,10 +15,10 @@ namespace MarkdownDeepTests {
 			string str = "[id]: <url.com> (my title)";
 			r = LinkDefinition.ParseLinkDefinition(str, false);
 
-			Assert.IsNotNull(r);
-			Assert.AreEqual(r.Id, "id");
-			Assert.AreEqual(r.Url, "url.com");
-			Assert.AreEqual(r.Title, "my title");
+			ClassicAssert.IsNotNull(r);
+			ClassicAssert.AreEqual(r.Id, "id");
+			ClassicAssert.AreEqual(r.Url, "url.com");
+			ClassicAssert.AreEqual(r.Title, "my title");
 		}
 
 		[Test]
@@ -25,23 +26,23 @@ namespace MarkdownDeepTests {
 			string str = "[id]: url.com \"my title\"";
 			r = LinkDefinition.ParseLinkDefinition(str, false);
 
-			Assert.IsNotNull(r);
-			Assert.AreEqual(r.Id, "id");
-			Assert.AreEqual(r.Url, "url.com");
-			Assert.AreEqual(r.Title, "my title");
+			ClassicAssert.IsNotNull(r);
+			ClassicAssert.AreEqual(r.Id, "id");
+			ClassicAssert.AreEqual(r.Url, "url.com");
+			ClassicAssert.AreEqual(r.Title, "my title");
 		}
 
 		[Test]
 		public void Invalid() {
-			Assert.IsNull(LinkDefinition.ParseLinkDefinition("[id", false));
-			Assert.IsNull(LinkDefinition.ParseLinkDefinition("[id]", false));
-			Assert.IsNull(LinkDefinition.ParseLinkDefinition("[id]:", false));
-			Assert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url", false));
-			Assert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url> \"title", false));
-			Assert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url> \'title", false));
-			Assert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url> (title", false));
-			Assert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url> \"title\" crap", false));
-			Assert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url> crap", false));
+			ClassicAssert.IsNull(LinkDefinition.ParseLinkDefinition("[id", false));
+			ClassicAssert.IsNull(LinkDefinition.ParseLinkDefinition("[id]", false));
+			ClassicAssert.IsNull(LinkDefinition.ParseLinkDefinition("[id]:", false));
+			ClassicAssert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url", false));
+			ClassicAssert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url> \"title", false));
+			ClassicAssert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url> \'title", false));
+			ClassicAssert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url> (title", false));
+			ClassicAssert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url> \"title\" crap", false));
+            ClassicAssert.IsNull(LinkDefinition.ParseLinkDefinition("[id]: <url> crap", false));
 		}
 
 		[Test]
@@ -49,10 +50,10 @@ namespace MarkdownDeepTests {
 			string str = "[id]:\n\t     http://www.site.com \n\t      (my title)";
 			r = LinkDefinition.ParseLinkDefinition(str, false);
 
-			Assert.IsNotNull(r);
-			Assert.AreEqual(r.Id, "id");
-			Assert.AreEqual(r.Url, "http://www.site.com");
-			Assert.AreEqual(r.Title, "my title");
+			ClassicAssert.IsNotNull(r);
+			ClassicAssert.AreEqual(r.Id, "id");
+			ClassicAssert.AreEqual(r.Url, "http://www.site.com");
+			ClassicAssert.AreEqual(r.Title, "my title");
 		}
 
 		[Test]
@@ -60,10 +61,10 @@ namespace MarkdownDeepTests {
 			string str = "[id]: url.com";
 			r = LinkDefinition.ParseLinkDefinition(str, false);
 
-			Assert.IsNotNull(r);
-			Assert.AreEqual(r.Id, "id");
-			Assert.AreEqual(r.Url, "url.com");
-			Assert.AreEqual(r.Title, null);
+			ClassicAssert.IsNotNull(r);
+			ClassicAssert.AreEqual(r.Id, "id");
+			ClassicAssert.AreEqual(r.Url, "url.com");
+			ClassicAssert.AreEqual(r.Title, null);
 		}
 
 		[Test]
@@ -71,10 +72,10 @@ namespace MarkdownDeepTests {
 			string str = "[id]: url.com (my title)";
 			r = LinkDefinition.ParseLinkDefinition(str, false);
 
-			Assert.IsNotNull(r);
-			Assert.AreEqual(r.Id, "id");
-			Assert.AreEqual(r.Url, "url.com");
-			Assert.AreEqual(r.Title, "my title");
+			ClassicAssert.IsNotNull(r);
+			ClassicAssert.AreEqual(r.Id, "id");
+			ClassicAssert.AreEqual(r.Url, "url.com");
+			ClassicAssert.AreEqual(r.Title, "my title");
 		}
 
 		[Test]
@@ -82,10 +83,10 @@ namespace MarkdownDeepTests {
 			string str = "[id]: url.com \'my title\'";
 			r = LinkDefinition.ParseLinkDefinition(str, false);
 
-			Assert.IsNotNull(r);
-			Assert.AreEqual(r.Id, "id");
-			Assert.AreEqual(r.Url, "url.com");
-			Assert.AreEqual(r.Title, "my title");
+			ClassicAssert.IsNotNull(r);
+			ClassicAssert.AreEqual(r.Id, "id");
+			ClassicAssert.AreEqual(r.Url, "url.com");
+			ClassicAssert.AreEqual(r.Title, "my title");
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using MarkdownDeep;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace MarkdownDeepTests {
 	[TestFixture]
@@ -10,27 +11,27 @@ namespace MarkdownDeepTests {
 		SpanFormatter f;
 
 		[Test]
-		public void AllEscapeCharacters() => Assert.AreEqual(@"pre \ ` * _ { } [ ] ( ) # + - . ! post",
+		public void AllEscapeCharacters() => ClassicAssert.AreEqual(@"pre \ ` * _ { } [ ] ( ) # + - . ! post",
 				f.Format(@"pre \\ \` \* \_ \{ \} \[ \] \( \) \# \+ \- \. \! post"));
 
 		[Test]
-		public void BackslashWithGT() => Assert.AreEqual(@"backslash with \&gt; greater",
+		public void BackslashWithGT() => ClassicAssert.AreEqual(@"backslash with \&gt; greater",
 				f.Format(@"backslash with \\> greater"));
 
 		[Test]
-		public void BackslashWithTwoDashes() => Assert.AreEqual(@"backslash with \-- two dashes",
+		public void BackslashWithTwoDashes() => ClassicAssert.AreEqual(@"backslash with \-- two dashes",
 				f.Format(@"backslash with \\-- two dashes"));
 
 		[Test]
-		public void EscapeNotALink() => Assert.AreEqual(@"\[test](not a link)",
+		public void EscapeNotALink() => ClassicAssert.AreEqual(@"\[test](not a link)",
 				f.Format(@"\\\[test](not a link)"));
 
 		[Test]
-		public void NoEmphasis() => Assert.AreEqual(@"\*no emphasis*",
+		public void NoEmphasis() => ClassicAssert.AreEqual(@"\*no emphasis*",
 				f.Format(@"\\\*no emphasis*"));
 
 		[Test]
-		public void SomeNonEscapableCharacters() => Assert.AreEqual(@"pre \q \% \? post",
+		public void SomeNonEscapableCharacters() => ClassicAssert.AreEqual(@"pre \q \% \? post",
 				f.Format(@"pre \q \% \? post"));
 	}
 }

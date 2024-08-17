@@ -1,5 +1,6 @@
 ﻿using MarkdownDeep;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace MarkdownDeepTests {
 	[TestFixture]
@@ -11,26 +12,26 @@ namespace MarkdownDeepTests {
 
 		[Test]
 		public void ContentEncoded() {
-			Assert.AreEqual("pre <code>&lt;div&gt;</code> post",
+			ClassicAssert.AreEqual("pre <code>&lt;div&gt;</code> post",
 				f.Format("pre ```` <div> ```` post"));
-			Assert.AreEqual("pre <code>&amp;amp;</code> post",
+			ClassicAssert.AreEqual("pre <code>&amp;amp;</code> post",
 				f.Format("pre ```` &amp; ```` post"));
 		}
 
 		[Test]
-		public void MultiTick() => Assert.AreEqual("pre <code>code span</code> post",
+		public void MultiTick() => ClassicAssert.AreEqual("pre <code>code span</code> post",
 				f.Format("pre ````code span```` post"));
 
 		[Test]
-		public void MultiTickWithEmbeddedTicks() => Assert.AreEqual("pre <code>`code span`</code> post",
+		public void MultiTickWithEmbeddedTicks() => ClassicAssert.AreEqual("pre <code>`code span`</code> post",
 				f.Format("pre ```` `code span` ```` post"));
 
 		[Test]
-		public void SingleTick() => Assert.AreEqual("pre <code>code span</code> post",
+		public void SingleTick() => ClassicAssert.AreEqual("pre <code>code span</code> post",
 				f.Format("pre `code span` post"));
 
 		[Test]
-		public void SingleTickWithSpaces() => Assert.AreEqual("pre <code>code span</code> post",
+		public void SingleTickWithSpaces() => ClassicAssert.AreEqual("pre <code>code span</code> post",
 				f.Format("pre ` code span ` post"));
 	}
 }

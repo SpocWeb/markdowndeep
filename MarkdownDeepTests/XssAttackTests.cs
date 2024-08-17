@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using MarkdownDeep;
+﻿using MarkdownDeep;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace MarkdownDeepTests {
 
@@ -85,8 +83,8 @@ namespace MarkdownDeepTests {
 					scanner.SkipForward(1);
 				} else {
 					if (tag.IsSafe()) {
-						// There's a few tags that really are safe in the test data
-						Assert.IsTrue(IsTagReallySafe(tag));
+                        // There's a few tags that really are safe in the test data
+                        ClassicAssert.IsTrue(IsTagReallySafe(tag));
 					}
 				}
 			}
@@ -100,7 +98,7 @@ namespace MarkdownDeepTests {
 			while (!scanner.Eof) {
 				HtmlTag tag = scanner.ParseHtml();
 				if (tag != null) {
-					Assert.IsTrue(tag.IsSafe());
+					ClassicAssert.IsTrue(tag.IsSafe());
 				} else {
 					// Next character
 					scanner.SkipForward(1);

@@ -1,5 +1,6 @@
 ﻿using MarkdownDeep;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace MarkdownDeepTests {
 	[TestFixture]
@@ -10,153 +11,153 @@ namespace MarkdownDeepTests {
 		SpanFormatter f;
 
 		[Test]
-		public void PlainText() => Assert.AreEqual("This is plain text",
+		public void PlainText() => ClassicAssert.AreEqual("This is plain text",
 				f.Format("This is plain text"));
 
 
 		[Test]
-		public void combined_1() => Assert.AreEqual("<strong><em>test test</em></strong>",
+		public void combined_1() => ClassicAssert.AreEqual("<strong><em>test test</em></strong>",
 				f.Format("***test test***"));
 
 
 		[Test]
-		public void combined_10() => Assert.AreEqual("<em>test <strong>test</strong></em>",
+		public void combined_10() => ClassicAssert.AreEqual("<em>test <strong>test</strong></em>",
 				f.Format("_test __test___"));
 
 
 		[Test]
-		public void combined_11() => Assert.AreEqual("<strong>test <em>test</em></strong>",
+		public void combined_11() => ClassicAssert.AreEqual("<strong>test <em>test</em></strong>",
 				f.Format("__test _test___"));
 
 
 		[Test]
-		public void combined_12() => Assert.AreEqual("<strong><em>test</em> test</strong>",
+		public void combined_12() => ClassicAssert.AreEqual("<strong><em>test</em> test</strong>",
 				f.Format("___test_ test__"));
 
 
 		[Test]
-		public void combined_13() => Assert.AreEqual("<em><strong>test</strong> test</em>",
+		public void combined_13() => ClassicAssert.AreEqual("<em><strong>test</strong> test</em>",
 				f.Format("___test__ test_"));
 
 
 		[Test]
-		public void combined_14() => Assert.AreEqual("<strong><em>test</em> test</strong>",
+		public void combined_14() => ClassicAssert.AreEqual("<strong><em>test</em> test</strong>",
 				f.Format("___test_ test__"));
 
 
 		[Test]
-		public void combined_15() => Assert.AreEqual("<strong>test <em>test</em></strong>",
+		public void combined_15() => ClassicAssert.AreEqual("<strong>test <em>test</em></strong>",
 				f.Format("__test _test___"));
 
 
 		[Test]
-		public void combined_16() => Assert.AreEqual("<em>test <strong>test</strong></em>",
+		public void combined_16() => ClassicAssert.AreEqual("<em>test <strong>test</strong></em>",
 				f.Format("_test __test___"));
 
 		[Test]
 		public void combined_17() {
 			var fExtra = new SpanFormatter(new Markdown {IsExtraMode = true});
-			Assert.AreEqual("<strong>Bold</strong> <em>Italic</em>",
+			ClassicAssert.AreEqual("<strong>Bold</strong> <em>Italic</em>",
 				fExtra.Format("__Bold__ _Italic_"));
 		}
 
 		[Test]
 		public void combined_18() {
 			var fExtra = new SpanFormatter(new Markdown {IsExtraMode = true});
-			Assert.AreEqual("<em>Emphasis</em>, trailing",
+			ClassicAssert.AreEqual("<em>Emphasis</em>, trailing",
 				fExtra.Format("_Emphasis_, trailing"));
 		}
 
 		[Test]
-		public void combined_2() => Assert.AreEqual("<strong><em>test test</em></strong>",
+		public void combined_2() => ClassicAssert.AreEqual("<strong><em>test test</em></strong>",
 				f.Format("___test test___"));
 
 
 		[Test]
-		public void combined_3() => Assert.AreEqual("<em>test <strong>test</strong></em>",
+		public void combined_3() => ClassicAssert.AreEqual("<em>test <strong>test</strong></em>",
 				f.Format("*test **test***"));
 
 
 		[Test]
-		public void combined_4() => Assert.AreEqual("<strong>test <em>test</em></strong>",
+		public void combined_4() => ClassicAssert.AreEqual("<strong>test <em>test</em></strong>",
 				f.Format("**test *test***"));
 
 
 		[Test]
-		public void combined_5() => Assert.AreEqual("<strong><em>test</em> test</strong>",
+		public void combined_5() => ClassicAssert.AreEqual("<strong><em>test</em> test</strong>",
 				f.Format("***test* test**"));
 
 
 		[Test]
-		public void combined_6() => Assert.AreEqual("<em><strong>test</strong> test</em>",
+		public void combined_6() => ClassicAssert.AreEqual("<em><strong>test</strong> test</em>",
 				f.Format("***test** test*"));
 
 
 		[Test]
-		public void combined_7() => Assert.AreEqual("<strong><em>test</em> test</strong>",
+		public void combined_7() => ClassicAssert.AreEqual("<strong><em>test</em> test</strong>",
 				f.Format("***test* test**"));
 
 
 		[Test]
-		public void combined_8() => Assert.AreEqual("<strong>test <em>test</em></strong>",
+		public void combined_8() => ClassicAssert.AreEqual("<strong>test <em>test</em></strong>",
 				f.Format("**test *test***"));
 
 
 		[Test]
-		public void combined_9() => Assert.AreEqual("<em>test <strong>test</strong></em>",
+		public void combined_9() => ClassicAssert.AreEqual("<em>test <strong>test</strong></em>",
 				f.Format("*test **test***"));
 
 		[Test]
-		public void em_in_word() => Assert.AreEqual("un<em>frigging</em>believable",
+		public void em_in_word() => ClassicAssert.AreEqual("un<em>frigging</em>believable",
 				f.Format("un*frigging*believable"));
 
 		[Test]
 		public void em_simple() {
-			Assert.AreEqual("This is <em>em</em> text",
+			ClassicAssert.AreEqual("This is <em>em</em> text",
 				f.Format("This is *em* text"));
-			Assert.AreEqual("This is <em>em</em> text",
+			ClassicAssert.AreEqual("This is <em>em</em> text",
 				f.Format("This is _em_ text"));
 		}
 
 		[Test]
 		public void em_strong_lead_tail() {
-			Assert.AreEqual("<strong>strong</strong>",
+			ClassicAssert.AreEqual("<strong>strong</strong>",
 				f.Format("__strong__"));
-			Assert.AreEqual("<strong>strong</strong>",
+			ClassicAssert.AreEqual("<strong>strong</strong>",
 				f.Format("**strong**"));
-			Assert.AreEqual("<em>em</em>",
+			ClassicAssert.AreEqual("<em>em</em>",
 				f.Format("_em_"));
-			Assert.AreEqual("<em>em</em>",
+			ClassicAssert.AreEqual("<em>em</em>",
 				f.Format("*em*"));
 		}
 
 		[Test]
 		public void no_strongem_if_spaces() {
-			Assert.AreEqual("pre * notem *",
+			ClassicAssert.AreEqual("pre * notem *",
 				f.Format("pre * notem *"));
-			Assert.AreEqual("pre ** notstrong **",
+			ClassicAssert.AreEqual("pre ** notstrong **",
 				f.Format("pre ** notstrong **"));
-			Assert.AreEqual("pre *Apples *Bananas *Oranges",
+			ClassicAssert.AreEqual("pre *Apples *Bananas *Oranges",
 				f.Format("pre *Apples *Bananas *Oranges"));
 		}
 
 		[Test]
-		public void strong_in_word() => Assert.AreEqual("un<strong>frigging</strong>believable",
+		public void strong_in_word() => ClassicAssert.AreEqual("un<strong>frigging</strong>believable",
 				f.Format("un**frigging**believable"));
 
 		[Test]
 		public void strong_simple() {
-			Assert.AreEqual("This is <strong>strong</strong> text",
+			ClassicAssert.AreEqual("This is <strong>strong</strong> text",
 				f.Format("This is **strong** text"));
-			Assert.AreEqual("This is <strong>strong</strong> text",
+			ClassicAssert.AreEqual("This is <strong>strong</strong> text",
 				f.Format("This is __strong__ text"));
 		}
 
 		[Test]
 		public void strongem() {
-			Assert.AreEqual("<strong><em>strongem</em></strong>",
+			ClassicAssert.AreEqual("<strong><em>strongem</em></strong>",
 				f.Format("***strongem***"));
-			Assert.AreEqual("<strong><em>strongem</em></strong>",
+			ClassicAssert.AreEqual("<strong><em>strongem</em></strong>",
 				f.Format("___strongem___"));
 		}
 	}

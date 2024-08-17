@@ -1,5 +1,6 @@
 ﻿using MarkdownDeep;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace MarkdownDeepTests {
 	[TestFixture]
@@ -9,28 +10,28 @@ namespace MarkdownDeepTests {
 			var p = new StringScanner();
 
 			p.Reset("This is a string with something [bracketed]");
-			Assert.IsTrue(p.Bof);
-			Assert.IsFalse(p.Eof);
-			Assert.IsTrue(p.SkipString("This"));
-			Assert.IsFalse(p.Bof);
-			Assert.IsFalse(p.Eof);
-			Assert.IsFalse(p.SkipString("huh?"));
-			Assert.IsTrue(p.SkipLinespace());
-			Assert.IsTrue(p.SkipChar('i'));
-			Assert.IsTrue(p.SkipChar('s'));
-			Assert.IsTrue(p.SkipWhitespace());
-			Assert.IsTrue(p.DoesMatchAny(new[] {'r', 'a', 't'}));
-			Assert.IsFalse(p.Find("Not here"));
-			Assert.IsFalse(p.Find("WITH"));
-			Assert.IsFalse(p.FindI("Not here"));
-			Assert.IsTrue(p.FindI("WITH"));
-			Assert.IsTrue(p.Find('['));
+			ClassicAssert.IsTrue(p.Bof);
+			ClassicAssert.IsFalse(p.Eof);
+			ClassicAssert.IsTrue(p.SkipString("This"));
+			ClassicAssert.IsFalse(p.Bof);
+			ClassicAssert.IsFalse(p.Eof);
+			ClassicAssert.IsFalse(p.SkipString("huh?"));
+			ClassicAssert.IsTrue(p.SkipLinespace());
+			ClassicAssert.IsTrue(p.SkipChar('i'));
+			ClassicAssert.IsTrue(p.SkipChar('s'));
+			ClassicAssert.IsTrue(p.SkipWhitespace());
+			ClassicAssert.IsTrue(p.DoesMatchAny(new[] {'r', 'a', 't'}));
+			ClassicAssert.IsFalse(p.Find("Not here"));
+			ClassicAssert.IsFalse(p.Find("WITH"));
+			ClassicAssert.IsFalse(p.FindI("Not here"));
+			ClassicAssert.IsTrue(p.FindI("WITH"));
+            ClassicAssert.IsTrue(p.Find('['));
 			p.SkipForward(1);
 			p.Mark();
-			Assert.IsTrue(p.Find(']'));
-			Assert.AreEqual("bracketed", p.Extract());
-			Assert.IsTrue(p.SkipChar(']'));
-			Assert.IsTrue(p.Eof);
+			ClassicAssert.IsTrue(p.Find(']'));
+			ClassicAssert.AreEqual("bracketed", p.Extract());
+			ClassicAssert.IsTrue(p.SkipChar(']'));
+            ClassicAssert.IsTrue(p.Eof);
 		}
 	}
 }

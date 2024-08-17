@@ -1,5 +1,6 @@
 ﻿using MarkdownDeep;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace MarkdownDeepTests {
 
@@ -15,11 +16,11 @@ namespace MarkdownDeepTests {
 			const string str = "<div/>";
 			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.Name, "div");
-			Assert.AreEqual(tag.IsClosing, false);
-			Assert.AreEqual(tag.IsClosed, true);
-			Assert.AreEqual(tag.Attributes.Count, 0);
-			Assert.AreEqual(_Pos, str.Length);
+			ClassicAssert.AreEqual(tag.Name, "div");
+			ClassicAssert.AreEqual(tag.IsClosing, false);
+			ClassicAssert.AreEqual(tag.IsClosed, true);
+			ClassicAssert.AreEqual(tag.Attributes.Count, 0);
+			ClassicAssert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
@@ -27,13 +28,13 @@ namespace MarkdownDeepTests {
 			const string str = "<div x=1 y=2/>";
 			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.Name, "div");
-			Assert.AreEqual(tag.IsClosing, false);
-			Assert.AreEqual(tag.IsClosed, true);
-			Assert.AreEqual(tag.Attributes.Count, 2);
-			Assert.AreEqual(tag.Attributes["x"], "1");
-			Assert.AreEqual(tag.Attributes["y"], "2");
-			Assert.AreEqual(_Pos, str.Length);
+			ClassicAssert.AreEqual(tag.Name, "div");
+			ClassicAssert.AreEqual(tag.IsClosing, false);
+			ClassicAssert.AreEqual(tag.IsClosed, true);
+			ClassicAssert.AreEqual(tag.Attributes.Count, 2);
+			ClassicAssert.AreEqual(tag.Attributes["x"], "1");
+			ClassicAssert.AreEqual(tag.Attributes["y"], "2");
+			ClassicAssert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
@@ -41,11 +42,11 @@ namespace MarkdownDeepTests {
 			const string str = "</div>";
 			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.Name, "div");
-			Assert.AreEqual(tag.IsClosing, true);
-			Assert.AreEqual(tag.IsClosed, false);
-			Assert.AreEqual(tag.Attributes.Count, 0);
-			Assert.AreEqual(_Pos, str.Length);
+			ClassicAssert.AreEqual(tag.Name, "div");
+			ClassicAssert.AreEqual(tag.IsClosing, true);
+			ClassicAssert.AreEqual(tag.IsClosed, false);
+			ClassicAssert.AreEqual(tag.Attributes.Count, 0);
+			ClassicAssert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
@@ -53,12 +54,12 @@ namespace MarkdownDeepTests {
 			const string str = "<!-- comment -->";
 			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.Name, "!");
-			Assert.AreEqual(tag.IsClosing, false);
-			Assert.AreEqual(tag.IsClosed, true);
-			Assert.AreEqual(tag.Attributes.Count, 1);
-			Assert.AreEqual(tag.Attributes["content"], " comment ");
-			Assert.AreEqual(_Pos, str.Length);
+			ClassicAssert.AreEqual(tag.Name, "!");
+			ClassicAssert.AreEqual(tag.IsClosing, false);
+			ClassicAssert.AreEqual(tag.IsClosed, true);
+			ClassicAssert.AreEqual(tag.Attributes.Count, 1);
+			ClassicAssert.AreEqual(tag.Attributes["content"], " comment ");
+			ClassicAssert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
@@ -66,11 +67,11 @@ namespace MarkdownDeepTests {
 			const string str = "<div>";
 			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.Name, "div");
-			Assert.AreEqual(tag.IsClosing, false);
-			Assert.AreEqual(tag.IsClosed, false);
-			Assert.AreEqual(tag.Attributes.Count, 0);
-			Assert.AreEqual(_Pos, str.Length);
+			ClassicAssert.AreEqual(tag.Name, "div");
+			ClassicAssert.AreEqual(tag.IsClosing, false);
+			ClassicAssert.AreEqual(tag.IsClosed, false);
+			ClassicAssert.AreEqual(tag.Attributes.Count, 0);
+			ClassicAssert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
@@ -78,15 +79,15 @@ namespace MarkdownDeepTests {
 			const string str = "<iframe y='2' allowfullscreen x='1' foo>";
 			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.Name, "iframe");
-			Assert.AreEqual(tag.IsClosing, false);
-			Assert.AreEqual(tag.IsClosed, false);
-			Assert.AreEqual(tag.Attributes.Count, 4);
-			Assert.AreEqual(tag.Attributes["allowfullscreen"], "");
-			Assert.AreEqual(tag.Attributes["foo"], "");
-			Assert.AreEqual(tag.Attributes["y"], "2");
-			Assert.AreEqual(tag.Attributes["x"], "1");
-			Assert.AreEqual(_Pos, str.Length);
+			ClassicAssert.AreEqual(tag.Name, "iframe");
+			ClassicAssert.AreEqual(tag.IsClosing, false);
+			ClassicAssert.AreEqual(tag.IsClosed, false);
+			ClassicAssert.AreEqual(tag.Attributes.Count, 4);
+			ClassicAssert.AreEqual(tag.Attributes["allowfullscreen"], "");
+			ClassicAssert.AreEqual(tag.Attributes["foo"], "");
+			ClassicAssert.AreEqual(tag.Attributes["y"], "2");
+			ClassicAssert.AreEqual(tag.Attributes["x"], "1");
+			ClassicAssert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
@@ -94,13 +95,13 @@ namespace MarkdownDeepTests {
 			const string str = "<div x=\"1\" y=\"2\">";
 			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.Name, "div");
-			Assert.AreEqual(tag.IsClosing, false);
-			Assert.AreEqual(tag.IsClosed, false);
-			Assert.AreEqual(tag.Attributes.Count, 2);
-			Assert.AreEqual(tag.Attributes["x"], "1");
-			Assert.AreEqual(tag.Attributes["y"], "2");
-			Assert.AreEqual(_Pos, str.Length);
+			ClassicAssert.AreEqual(tag.Name, "div");
+			ClassicAssert.AreEqual(tag.IsClosing, false);
+			ClassicAssert.AreEqual(tag.IsClosed, false);
+			ClassicAssert.AreEqual(tag.Attributes.Count, 2);
+			ClassicAssert.AreEqual(tag.Attributes["x"], "1");
+			ClassicAssert.AreEqual(tag.Attributes["y"], "2");
+			ClassicAssert.AreEqual(_Pos, str.Length);
 		}
 
 		[Test]
@@ -108,13 +109,13 @@ namespace MarkdownDeepTests {
 			const string str = "<div x=1 y=2>";
 			HtmlTag tag = str.ParseHtml(ref _Pos);
 
-			Assert.AreEqual(tag.Name, "div");
-			Assert.AreEqual(tag.IsClosing, false);
-			Assert.AreEqual(tag.IsClosed, false);
-			Assert.AreEqual(tag.Attributes.Count, 2);
-			Assert.AreEqual(tag.Attributes["x"], "1");
-			Assert.AreEqual(tag.Attributes["y"], "2");
-			Assert.AreEqual(_Pos, str.Length);
+			ClassicAssert.AreEqual(tag.Name, "div");
+			ClassicAssert.AreEqual(tag.IsClosing, false);
+			ClassicAssert.AreEqual(tag.IsClosed, false);
+			ClassicAssert.AreEqual(tag.Attributes.Count, 2);
+			ClassicAssert.AreEqual(tag.Attributes["x"], "1");
+			ClassicAssert.AreEqual(tag.Attributes["y"], "2");
+			ClassicAssert.AreEqual(_Pos, str.Length);
 		}
 	}
 }
