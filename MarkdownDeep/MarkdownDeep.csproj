@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<DefaultItemExcludes>$(DefaultItemExcludes);**\*.vrn;**\*.vrn.zip</DefaultItemExcludes>
+		<DefaultItemExcludes>$(DefaultItemExcludes);**\*.bak;**\*.vrn;**\*.vrn.zip</DefaultItemExcludes>
 		<EnableDefaultItems>true</EnableDefaultItems>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
