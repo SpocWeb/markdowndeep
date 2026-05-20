@@ -20,7 +20,7 @@
     </Content>
   </ItemGroup>
   <PropertyGroup>
-    <TargetFrameworks>net48;net8.0</TargetFrameworks>
+    <TargetFrameworks>net48;net10.0</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\NET\org.SpocWeb.snk</AssemblyOriginatorKeyFile>
     <RootNamespace>$(MSBuildProjectName)</RootNamespace>
