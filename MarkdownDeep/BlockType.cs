@@ -3,6 +3,14 @@ namespace MarkdownDeep {
 	/// <summary> Block types; Some are used only during block parsing, 
 	/// some are only used during rendering and some are used during both
 	/// </summary>
+	///
+	/// <example>
+	/// <code language="yaml">
+	/// pass: 2
+	/// mtime: 2023-06-25T16:41:12Z
+	/// digest: 9536a129aebd602348bf7a5bc0f601875950884ecf7d155dbfc5901336c5148a
+	/// </code>
+	/// </example>
 	internal enum BlockType {
 		// ReSharper disable InconsistentNaming
 

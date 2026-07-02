@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Markup;
@@ -10,6 +10,14 @@ using org.SpocWeb.root.Extensions;
 namespace MarkDownWpfGui;
 
 /// <summary> MarkDownWindow </summary>
+///
+/// <example>
+/// <code language="yaml">
+/// pass: 2
+/// mtime: 2024-07-21T16:52:37Z
+/// digest: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+/// </code>
+/// </example>
 public partial class MainWindow {
 
 	readonly Markdown _Markdown = new Markdown {

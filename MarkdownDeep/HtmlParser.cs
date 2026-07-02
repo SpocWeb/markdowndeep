@@ -1,6 +1,14 @@
 namespace MarkdownDeep {
 
 	/// <summary> static methods for parsing an HTML tag out of StringScanner. </summary>
+	///
+	/// <example>
+	/// <code language="yaml">
+	/// pass: 2
+	/// mtime: 2023-06-25T15:43:09Z
+	/// digest: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+	/// </code>
+	/// </example>
 	public static class HtmlParser {
 
 		public static HtmlTag ParseHtml(this string str, ref int pos) {

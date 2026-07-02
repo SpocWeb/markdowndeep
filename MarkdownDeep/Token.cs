@@ -1,4 +1,4 @@
-﻿namespace MarkdownDeep {
+namespace MarkdownDeep {
 
 	/// <summary> single element in a tokenized span. Used by the SpanFormatter class to represent the internal structure of a span of text. </summary>
 	/// <remarks>
@@ -6,6 +6,13 @@
 	/// * Strings aren't actually stored in the token - just their offset and length in the input string.
 	/// * For performance, Token's are pooled and reused. See SpanFormatter.CreateToken()
 	/// </remarks>
+	/// <example>
+	/// <code language="yaml">
+	/// pass: 2
+	/// mtime: 2024-07-21T13:01:10Z
+	/// digest: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+	/// </code>
+	/// </example>
 	internal class Token {
 		// Constructor
 		public object? _Data;

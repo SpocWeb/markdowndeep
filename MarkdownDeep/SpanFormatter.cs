@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -9,6 +9,13 @@ namespace MarkdownDeep {
 	/// <remarks>
 	/// Spans are internal to blocks (similar HTML block vs inline elements).
 	/// </remarks>
+	/// <example>
+	/// <code language="yaml">
+	/// pass: 2
+	/// mtime: 2024-07-21T16:01:06Z
+	/// digest: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+	/// </code>
+	/// </example>
 	internal class SpanFormatter : StringScanner {
 
 		/// <summary> reference to the owning markdown object, in case we need to check for formatting options </summary>

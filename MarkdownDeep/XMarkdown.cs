@@ -115,6 +115,13 @@ namespace MarkdownDeep {
 	///		that is used when rendering p blocks. 
 	///		It tokenizes the paragraph content and then renders either the normal p or the titled figure div tag.
 	/// </remarks>
+	/// <example>
+	/// <code language="yaml">
+	/// pass: 2
+	/// mtime: 2023-06-25T16:13:59Z
+	/// digest: 9b12b45e689c0118822b00742366565232da89a47e81f7fc110666dc924317ad
+	/// </code>
+	/// </example>
 	public static class XMarkdown {
 
 		/// <summary> Split the markdown into sections, one section for each top level heading </summary>

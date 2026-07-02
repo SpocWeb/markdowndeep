@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text;
 
 namespace MarkdownDeep {
@@ -11,6 +11,14 @@ namespace MarkdownDeep {
 	}
 
 	/// <summary> definition of a simple table, including column alignments, header text and row information. </summary>
+	///
+	/// <example>
+	/// <code language="yaml">
+	/// pass: 2
+	/// mtime: 2024-07-21T16:01:06Z
+	/// digest: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+	/// </code>
+	/// </example>
 	internal class TableSpec {
 		public const string NbSp = "&#160;";
 		public List<ColumnAlignment> Columns = new();

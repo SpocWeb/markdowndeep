@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
@@ -6,6 +6,14 @@ using System.Text;
 namespace MarkdownDeep {
 
 	/// <summary>  public API to MarkdownDeep; Transform method, configurable options and object pooling. </summary>
+	///
+	/// <example>
+	/// <code language="yaml">
+	/// pass: 2
+	/// mtime: 2024-07-21T16:10:06Z
+	/// digest: 0b1f4f269383633939c29d2ce0ac9d12315156d396b6a54ac22c8e77bbbf5706
+	/// </code>
+	/// </example>
 	public class Markdown {
 
 		public string AsHtml(string markDown) => AsHtml(markDown, out var defs);

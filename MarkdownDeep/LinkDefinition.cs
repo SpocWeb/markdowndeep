@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace MarkdownDeep {
 
@@ -8,6 +8,13 @@ namespace MarkdownDeep {
 	/// Has static methods for parsing a link definition or link target from a StringScanner. 
 	/// A LinkDefinition doesn't include the link text - <see cref="LinkInfo"/> for that.
 	/// </remarks>
+	/// <example>
+	/// <code language="yaml">
+	/// pass: 2
+	/// mtime: 2024-07-21T16:07:34Z
+	/// digest: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+	/// </code>
+	/// </example>
 	public class LinkDefinition {
 
 		public LinkDefinition(string? id, string? url = null, string? title = null) {

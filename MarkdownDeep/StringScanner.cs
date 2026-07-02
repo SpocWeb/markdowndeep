@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MarkdownDeep {
 
@@ -7,6 +7,13 @@ namespace MarkdownDeep {
 	/// Maintains a current position with various operations 
 	/// to inspect the current character, skip forward, check for matches, skip whitespace etc.
 	/// </remarks>
+	/// <example>
+	/// <code language="yaml">
+	/// pass: 2
+	/// mtime: 2024-07-21T16:01:06Z
+	/// digest: 0eb5b28f67f66c9381645892de8183dca541c37b65e0843b3a4a947f57253689
+	/// </code>
+	/// </example>
 	public class StringScanner {
 
 		int _End;

@@ -1,10 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace MarkdownDeep {
 
 	/// <summary> a HTML Element Tag, including name, attributes, closing tag info etc...  </summary>
+	///
+	/// <example>
+	/// <code language="yaml">
+	/// pass: 2
+	/// mtime: 2024-07-21T16:01:06Z
+	/// digest: bc8df35e901f5adc1654e23ef69ccfd93258577069038504bded1be185bf701a
+	/// </code>
+	/// </example>
 	public class HtmlTag {
 
 		public HtmlTag(string name) {
